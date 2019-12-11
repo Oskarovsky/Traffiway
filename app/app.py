@@ -67,6 +67,11 @@ def index():
                            known=session.get('known', False), current_time=datetime.utcnow())
 
 
+@app.shell_context_processor
+def make_shell_context():
+    return dict(db=db, User=User, Role=Role)
+
+
 @app.route('/user/<name>')
 def user(name):
     return render_template('user.html', name=name)
