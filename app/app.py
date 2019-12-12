@@ -7,6 +7,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_migrate import Migrate
+from flask_mail import Mail, Message
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
@@ -17,12 +18,21 @@ app.config['SECRET_KEY'] = 'difficult_password_xD'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['TRAFFIWAY_MAIL_SUBJECT_PREFIX'] = '[TraffiWay]'
+app.config['TRAFFIWAY_MAIL_SENDER'] = 'TraffiWay Admin <traffiway@gmail.com>'
+app.config['TRAFFIWAY_ADMIN'] = os.environ.get('TRAFFIWAY_ADMIN')
+
 db = SQLAlchemy(app)
 db.init_app(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 migrate = Migrate(app, db)
-
+mail = Mail(app)
 
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
@@ -60,6 +70,8 @@ def index():
             db.session.add(user)
             db.session.commit()
             session['known'] = False
+
+            send_email(app.config['TRAFFIWAY_ADMIN'], 'New User', 'mail/new_user', user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
@@ -67,6 +79,14 @@ def index():
         return redirect(url_for('index'))
     return render_template('index.html', form=form, name=session.get('name'),
                            known=session.get('known', False), current_time=datetime.utcnow())
+
+
+def send_email(to, subject, template, **kwargs):
+    msg = Message(app.config['TRAFFIWAY_MAIL_SUBJECT_PREFIX'] + subject,
+                  sender=app.config['TRAFFIWAY_MAIL_SENDER'], recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    msg.html = render_template(template + '.html', **kwargs)
+    mail.send(msg)
 
 
 @app.shell_context_processor
