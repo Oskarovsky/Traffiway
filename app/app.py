@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from threading import Thread
 
 from flask import Flask, flash, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
@@ -86,7 +87,14 @@ def send_email(to, subject, template, **kwargs):
                   sender=app.config['TRAFFIWAY_MAIL_SENDER'], recipients=[to])
     msg.body = render_template(template + '.txt', **kwargs)
     msg.html = render_template(template + '.html', **kwargs)
-    mail.send(msg)
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+    return thr
+
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
 
 
 @app.shell_context_processor
