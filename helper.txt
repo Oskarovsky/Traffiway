@@ -1,0 +1,9 @@
+# DATABASE MIGRATION
+# flask db stamp head # to make the current the same
+# flask db migrate
+# flask db upgrade
+
+#  DATABASE ADDING DATA via SHELL
+# u = User(email='oski@wp.pl', username='oskar')
+# db.session.add(u)
+# db.session.commit()
