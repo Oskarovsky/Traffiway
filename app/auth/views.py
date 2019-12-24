@@ -4,7 +4,7 @@ from . import auth
 from .. import db
 from ..models import User
 from ..email import send_email
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm
+from .forms import LoginForm, RegistrationForm, ChangePasswordForm, PasswordResetForm, ResetPasswordRequestForm
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -87,7 +87,7 @@ def unconfirmed():
     return render_template('auth/unconfirmed.html')
 
 
-@auth.route('/change-password', methods = ['GET', 'POST'])
+@auth.route('/change-password', methods=['GET', 'POST'])
 @login_required
 def change_password():
     form = ChangePasswordForm()
@@ -101,3 +101,34 @@ def change_password():
         else:
             flash('Invalid password')
     return render_template("auth/change_password.html", form=form)
+
+
+@auth.route('/reset', methods=['GET', 'POST'])
+def password_reset_request():
+    if not current_user.is_anonymous:
+        return redirect(url_for('main.index'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data.lower()).first()
+        if user:
+            token = user.generate_reset_token()
+            send_email(user.email, 'Reset your password', 'auth/email/reset_password', user=user, token=token)
+        flash('An email with instructions to reset your password has been sent to you.')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html', form=form)
+
+
+@auth.route('/reset/<token>', methods=['GET', 'POST'])
+def password_reset(token):
+    if not current_user.is_anonymous:
+        return redirect(url_for('main.index'))
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        if User.reset_password(token, form.password.data):
+            db.session.commit()
+            flash('Your password has been updated')
+            return redirect(url_for('auth.login'))
+        else:
+            return register(url_for('main.index'))
+    return render_template('auth/reset_password.html', form=form)
+
