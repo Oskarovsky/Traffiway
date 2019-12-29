@@ -69,9 +69,9 @@ def edit_profile_admin(id):
         user.username = form.username.data
         user.confirmed = form.confirmed.data
         user.role = Role.query.get(form.role.data)
-        user.company = user.company.data
-        user.location = user.location.data
-        user.about_me = user.about_me.data
+        user.company = form.company.data
+        user.location = form.location.data
+        user.about_me = form.about_me.data
         db.session.add(user)
         db.session.commit()
         flash('The profile has been updated.')
