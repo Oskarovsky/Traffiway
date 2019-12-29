@@ -1,4 +1,6 @@
-from flask import current_app
+import hashlib
+
+from flask import current_app, request
 from flask_login import UserMixin, AnonymousUserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -160,6 +162,13 @@ class User(UserMixin, db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
         db.session.commit()
+
+    # gravatar URL generation
+    def gravatar(self, size=100, default='wavatar', rating='g'):
+        url = 'https://secure.gravatar.com/avatar'
+        hash = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
+            url=url, hash=hash, size=size, default=default, rating=rating)
 
     def __repr__(self):
         return '<User %r>' % self.username
