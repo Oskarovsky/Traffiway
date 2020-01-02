@@ -84,6 +84,9 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
+    avatar_link = db.Column(db.String(64))
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
+    journeys = db.relationship('Journey', backref='author', lazy='dynamic')
 
     @property
     def password(self):
@@ -167,7 +170,7 @@ class User(UserMixin, db.Model):
         db.session.commit()
 
     # gravatar URL generation
-    def gravatar(self, size=100, default='mm', rating='g'):
+    def gravatar(self, size=100, default='retro', rating='g'):
         if request.is_secure:
             url = 'https://secure.gravatar.com/avatar'
         else:
@@ -204,6 +207,32 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 login_manager.anonymous_user = AnonymousUser
+
+
+class Post(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    localization = db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+class Journey(db.Model):
+    __tablename__ = 'journeys'
+    id = db.Column(db.Integer, primary_key=True)
+    start_localization = db.Column(db.String(64))
+    start_time = db.Column(db.DateTime, index=True)
+    destination = db.Column(db.String(64))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+class Item(db.Model):
+    __tablename__ = 'items'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    journey_id = db.Column(db.Integer, db.ForeignKey('journeys.id'))
+
 
 
 @login_manager.user_loader

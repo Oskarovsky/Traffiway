@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 {% block title %}Traffiway - Find the best way{% endblock %}
 
 {% block page_content %}
@@ -13,4 +14,33 @@
     </div>
     <p>The local date and time is {{ moment(current_time).format('LLL') }}</p>
     <p>Last seen {{ moment(current_time).fromNow(refresh=True) }}.</p>
+
+    <div>
+        {% if current_user %}
+            {{ wtf.quick_form(form) }}
+        {% endif %}
+    </div>
+
+    <ul class="posts">
+        {% for post in posts %}
+        <li class="post">
+            <div class="profile-thumbnail">
+                <a href="{{ url_for('.user', username=post.author.username) }}">
+                    <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+                </a>
+            </div>
+            <div class="post-content">
+                <div class="post-date">
+                    <b><a href="http://maps.google.com/?q={{ post.localization }}">{{ post.localization }}</a></b>
+                    ({{ moment(post.timestamp).fromNow() }})
+                </div>
+                <div class="post-author">
+                    <a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a>
+                </div>
+                <div class="post-body">{{ post.body }}</div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
 {% endblock %}
