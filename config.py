@@ -16,6 +16,7 @@ class Config:
     TRAFFIWAY_MAIL_SUBJECT_PREFIX = '[TraffiWay]'
     TRAFFIWAY_MAIL_SENDER = 'TraffiWay Admin <traffiway@gmail.com>'
     TRAFFIWAY_ADMIN = os.environ.get('TRAFFIWAY_ADMIN')
+    TRAFFIWAY_POSTS_PER_PAGE = 10
 
     @staticmethod
     def init_app(app):
