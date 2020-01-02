@@ -48,12 +48,20 @@
     {% endif %}
     {# END REGION #}
 
+    {# POSTS REGION #}
+    <p>{{ user.posts.count() }} traffiway posts.</p>
+    {# END REGION #}
+
     {# DATETIME REGION #}
     <p>
         Member since {{ moment(user.member_since).format('L') }}. <br />
         Last seen {{ moment(user.last_seen).fromNow() }}.
     </p>
     {# END REGION #}
+
+    <h3>Posts by {{ user.username }}</h3>
+    {% include '_posts.html' %}
+
 </div>
 </div>
 
