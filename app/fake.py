@@ -31,6 +31,6 @@ def posts(count=100):
     user_count = User.query.count()
     for i in range(count):
         u = User.query.offset(randint(0, user_count-1)).first()
-        p = Post(body=fake.text(), timestamp=fake.past_date(), author=u)
+        p = Post(body=fake.text(), timestamp=fake.past_date(), author=u, localization=fake.city())
         db.session.add(p)
     db.session.commit()
