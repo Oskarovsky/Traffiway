@@ -18,6 +18,8 @@ class Config:
     TRAFFIWAY_ADMIN = os.environ.get('TRAFFIWAY_ADMIN')
     TRAFFIWAY_POSTS_PER_PAGE = 10
 
+    HERE_API_KEY = os.environ.get('HERE_API_KEY')
+
     @staticmethod
     def init_app(app):
         pass

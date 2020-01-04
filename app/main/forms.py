@@ -48,3 +48,9 @@ class PostForm(FlaskForm):
     body = TextAreaField("What's happened on the street?", validators=[DataRequired()])
     localization = StringField("Place (localization)", validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+
+class MapForm(FlaskForm):
+    start_place = StringField('Start place', validators=[DataRequired(), Length(0, 64)])
+    next_place = StringField('Next place', validators=[DataRequired(), Length(0, 64)])
+    submit = SubmitField('Show')

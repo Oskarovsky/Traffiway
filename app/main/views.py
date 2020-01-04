@@ -1,15 +1,25 @@
+import json
+import tempfile
+
+import herepy
 from datetime import datetime
 
-from flask import render_template, session, redirect, url_for, current_app, flash, request
+import requests
+
+from flask import render_template, session, redirect, url_for, current_app, flash, request, jsonify
 from flask_login import login_required, current_user
 
 from . import main
-from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm
+from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, MapForm
 
 from .. import db
 from ..decorators import admin_required
 from ..models import User, Role, Post
 from ..email import send_email
+
+geocoderApi = herepy.GeocoderApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
+routingApi = herepy.RoutingApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
+response = geocoderApi.free_form('200 S Mathilda Sunnyvale CA')
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -85,4 +95,37 @@ def edit_profile_admin(id):
     return render_template('edit_profile.html', form=form, user=user)
 
 
+@main.route('/map', methods=['GET', 'POST'])
+def map():
+    form = MapForm()
+    if form.validate_on_submit():
+        start_place = form.start_place.data
+        start_point = geocoderApi.free_form(start_place)
+        start_dict = json.loads(start_point.as_json_string())
+        start_dict1 = start_dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+
+        next_place = form.next_place.data
+        next_point = geocoderApi.free_form(next_place)
+        next_dict = json.loads(next_point.as_json_string())
+        next_dict1 = next_dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+
+        start_point_positions = str(start_dict1['Latitude']) + ',' + str(start_dict1['Longitude'])
+        next_point_positions = str(next_dict1['Latitude']) + ',' + str(next_dict1['Longitude'])
+
+        # response = routingApi.car_route(start_dict1,
+        #                                 next_dict1)
+        response = routingApi.car_route([start_dict1['Latitude'], start_dict1['Longitude']],
+                                        [next_dict1['Latitude'], next_dict1['Longitude']],
+                                        [herepy.RouteMode.car, herepy.RouteMode.fastest])
+        return render_template('map.html', form=form, start_point=start_dict1, next_point=next_dict1, response=response,
+                               start_point_positions=json.dumps(start_point_positions),
+                               next_point_positions=json.dumps(next_point_positions))
+    return render_template('map.html', form=form)
+
+
+@main.route('/geocode', methods=['GET'])
+def handle_geocode():
+    geocoderApi = herepy.GeocoderApi(current_app.config['HERE_API_KEY'])
+    response = geocoderApi.free_form('200 S Mathilda Sunnyvale CA')
+    return response.as_json_string()
 
