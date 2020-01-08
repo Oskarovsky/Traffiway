@@ -14,7 +14,7 @@ from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, Ma
 
 from .. import db
 from ..decorators import admin_required
-from ..models import User, Role, Post
+from ..models import User, Role, Post, Danger
 from ..email import send_email
 
 geocoderApi = herepy.GeocoderApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
@@ -27,8 +27,23 @@ response = geocoderApi.free_form('200 S Mathilda Sunnyvale CA')
 def index():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.body.data, localization=form.localization.data, author=current_user._get_current_object())
-        db.session.add(post)
+        post = Post(body=form.body.data, localization=form.localization.data,
+                    author=current_user._get_current_object())
+        position = geocoderApi.free_form(form.localization.data)
+        position_json = json.loads(position.as_json_string())['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+
+        latitude_int = float(position_json['Latitude'])
+        longitude_int = float(position_json['Longitude'])
+
+        latitude_up = latitude_int + 0.0100
+        longitude_up = longitude_int + 0.0100
+        latitude_down = latitude_int - 0.0100
+        longitude_down = longitude_int - 0.0100
+        position_geo = str(latitude_up) + ',' + str(longitude_up) + ';' + str(latitude_down) + ',' + str(longitude_down)
+        print(position_geo)
+
+        danger = Danger(place=form.localization.data, position=position_geo)
+        db.session.add(danger, post)
         db.session.commit()
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
@@ -112,13 +127,16 @@ def map():
         start_point_positions = str(start_dict1['Latitude']) + ',' + str(start_dict1['Longitude'])
         next_point_positions = str(next_dict1['Latitude']) + ',' + str(next_dict1['Longitude'])
 
+        all_dangers = [Danger.position for Danger in Danger.query.all()]
+        danger_list = '!'.join(all_dangers)
+        print(danger_list)
         # response = routingApi.car_route(start_dict1,
         #                                 next_dict1)
         response = routingApi.car_route([start_dict1['Latitude'], start_dict1['Longitude']],
                                         [next_dict1['Latitude'], next_dict1['Longitude']],
                                         [herepy.RouteMode.car, herepy.RouteMode.fastest])
         return render_template('map.html', form=form, start_point=start_dict1, next_point=next_dict1, response=response,
-                               start_point_positions=json.dumps(start_point_positions),
+                               start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
                                next_point_positions=json.dumps(next_point_positions))
     return render_template('map.html', form=form)
 
