@@ -46,6 +46,9 @@
 
       var start_point_positions = {{ start_point_positions|safe }};
       var next_point_positions = {{ next_point_positions|safe }};
+      var next_point_positions2 = {{ next_point_positions2|safe }};
+      {#var next_point_positions3 = {{ next_point_positions3|safe }};#}
+
       var avoid_areas = {{ danger_list|safe }};
 
       var routingParameters = {
@@ -55,9 +58,12 @@
       'waypoint0': 'geo!' + start_point_positions,
       // The end point of the route:
       'waypoint1': 'geo!' + next_point_positions,
+      'waypoint2': 'geo!' + next_point_positions2,
+      //'waypoint3': 'geo!' + next_point_positions3,
       // To retrieve the shape of the route we choose the route
       // representation mode 'display'
       'representation': 'display',
+      // areas which transport should avoid
       'avoidareas': avoid_areas
       };
 
