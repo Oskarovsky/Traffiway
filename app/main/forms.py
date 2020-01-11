@@ -53,8 +53,8 @@ class PostForm(FlaskForm):
 class MapForm(FlaskForm):
     start_place = StringField('Start place', validators=[DataRequired(), Length(0, 64)])
     next_place = StringField('Next place', validators=[DataRequired(), Length(0, 64)])
-    next_place2 = StringField('Next place2', validators=[DataRequired(), Length(0, 64)])
-    # next_place3 = StringField('Next place3', validators=[Length(0, 64)])
+    next_place2 = StringField('Next place2', validators=[Length(0, 64)])
+    next_place3 = StringField('Next place3', validators=[Length(0, 64)])
     # next_place4 = StringField('Next place4', validators=[Length(0, 64)])
     # next_place5 = StringField('Next place5', validators=[Length(0, 64)])
     # next_place6 = StringField('Next place6', validators=[Length(0, 64)])

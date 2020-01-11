@@ -113,46 +113,70 @@ def edit_profile_admin(id):
 @main.route('/map', methods=['GET', 'POST'])
 def map():
     form = MapForm()
+    temp_counter = 0
     if form.validate_on_submit():
         start_place = form.start_place.data
         start_point = geocoderApi.free_form(start_place)
         start_dict = json.loads(start_point.as_json_string())
         start_dict_json = start_dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+        start_point_positions = str(start_dict_json['Latitude']) + ',' + str(start_dict_json['Longitude'])
 
         next_place = form.next_place.data
         next_point = geocoderApi.free_form(next_place)
         next_dict = json.loads(next_point.as_json_string())
         next_dict_json = next_dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-
-        next_place2 = form.next_place2.data
-        next_point2 = geocoderApi.free_form(next_place2)
-        next_dict2 = json.loads(next_point2.as_json_string())
-        next_dict2_json = next_dict2['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-        #
-        # next_place3 = form.next_place3.data
-        # next_point3 = geocoderApi.free_form(next_place3)
-        # next_dict3 = json.loads(next_point3.as_json_string())
-        # next_dict3_json = next_dict3['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-
-        start_point_positions = str(start_dict_json['Latitude']) + ',' + str(start_dict_json['Longitude'])
         next_point_positions = str(next_dict_json['Latitude']) + ',' + str(next_dict_json['Longitude'])
-        next_point_positions2 = str(next_dict2_json['Latitude']) + ',' + str(next_dict2_json['Longitude'])
-        # next_point_positions3 = str(next_dict3_json['Latitude']) + ',' + str(next_dict3_json['Longitude'])
+        temp_counter += 1
+
+        next_place2 = form.next_place2.data or None
+        next_point_positions2 = None
+        if next_place2 is not None:
+            next_point2 = geocoderApi.free_form(next_place2)
+            next_dict2 = json.loads(next_point2.as_json_string())
+            next_dict2_json = next_dict2['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+            next_point_positions2 = str(next_dict2_json['Latitude']) + ',' + str(next_dict2_json['Longitude'])
+            temp_counter += 1
+
+        next_place3 = form.next_place3.data or None
+        next_point_positions3 = None
+        if next_place3 is not None:
+            next_point3 = geocoderApi.free_form(next_place3)
+            next_dict3 = json.loads(next_point3.as_json_string())
+            next_dict3_json = next_dict3['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+            next_point_positions3 = str(next_dict3_json['Latitude']) + ',' + str(next_dict3_json['Longitude'])
+            temp_counter += 1
+
+
+
+
+
 
         all_dangers = [Danger.position for Danger in Danger.query.all()]
         danger_list = '!'.join(all_dangers)
         print(danger_list)
-        # response = routingApi.car_route(start_dict1,
-        #                                 next_dict1)
-        response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-                                        [next_dict_json['Latitude'], next_dict_json['Longitude']],
-                                        [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
-                                        #[next_dict3_json['Latitude'], next_dict3_json['Longitude']],
-                                        [herepy.RouteMode.car, herepy.RouteMode.fastest])
+
+        if temp_counter == 1:
+            response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
+                                                     [next_dict_json['Latitude'], next_dict_json['Longitude']],
+                                                     [herepy.RouteMode.car, herepy.RouteMode.fastest])
+        if temp_counter == 2:
+            response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
+                                                     [next_dict_json['Latitude'], next_dict_json['Longitude']],
+                                                     [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
+                                                     [herepy.RouteMode.car, herepy.RouteMode.fastest])
+
+        if temp_counter == 3:
+            response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
+                                                     [next_dict_json['Latitude'], next_dict_json['Longitude']],
+                                                     [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
+                                                     [next_dict3_json['Latitude'], next_dict3_json['Longitude']],
+                                                     [herepy.RouteMode.car, herepy.RouteMode.fastest])
+
         return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, response=response,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
-                               next_point_positions=json.dumps(next_point_positions), next_point_positions2=json.dumps(next_point_positions2),
-                               next_point_position3=json.dumps(next_point_positions))
+                               next_point_positions=json.dumps(next_point_positions),
+                               next_point_positions2=json.dumps(next_point_positions2) or None,
+                               next_point_position3=json.dumps(next_point_positions3) or None)
     return render_template('map.html', form=form)
 
 
