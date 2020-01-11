@@ -58,6 +58,12 @@
 
         // Create the default UI:
         var ui = H.ui.UI.createDefault(map, maptypes, 'pl-PL');
+        var mapSettings = ui.getControl('mapsettings');
+        var zoom = ui.getControl('zoom');
+        var scalebar = ui.getControl('scalebar');
+
+        mapSettings.setAlignment('top-left');
+        zoom.setAlignment('top-left');
 
 
 
