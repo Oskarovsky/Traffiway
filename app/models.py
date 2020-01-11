@@ -223,6 +223,7 @@ class Danger(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     place = db.Column(db.String(64))
     position = db.Column(db.String(64))
+    position_center = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 

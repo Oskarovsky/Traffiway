@@ -39,10 +39,12 @@ def index():
         longitude_up = longitude_int + 0.0100
         latitude_down = latitude_int - 0.0100
         longitude_down = longitude_int - 0.0100
+        position_point = str(latitude_int) + ',' + str(longitude_int)
         position_geo = str(latitude_up) + ',' + str(longitude_up) + ';' + str(latitude_down) + ',' + str(longitude_down)
         print(position_geo)
 
-        danger = Danger(place=form.localization.data, position=position_geo)
+        danger = Danger(place=form.localization.data, position=position_geo, position_center=position_point)
+
         db.session.add(danger, post)
         db.session.commit()
         return redirect(url_for('.index'))
@@ -147,10 +149,6 @@ def map():
             temp_counter += 1
 
 
-
-
-
-
         all_dangers = [Danger.position for Danger in Danger.query.all()]
         danger_list = '!'.join(all_dangers)
         print(danger_list)
@@ -172,8 +170,10 @@ def map():
                                                      [next_dict3_json['Latitude'], next_dict3_json['Longitude']],
                                                      [herepy.RouteMode.car, herepy.RouteMode.fastest])
 
+
         return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, response=response,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
+                               #danger_list_center=json.dumps(danger_list_center),
                                next_point_positions=json.dumps(next_point_positions),
                                next_point_positions2=json.dumps(next_point_positions2) or None,
                                next_point_position3=json.dumps(next_point_positions3) or None)
