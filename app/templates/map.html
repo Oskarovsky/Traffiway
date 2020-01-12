@@ -196,39 +196,6 @@
       var next_point_positions6 = {{ next_point_positions6|safe }};
 
 
-{#      if (localization_counter === 3) {
-          if (time_from_start1 < time_from_start2 && time_from_start1 < time_from_start3) {
-              next_point_positions = {{ next_point_positions|safe }};
-              if (time_from_start2 < time_from_start3) {
-                  next_point_positions2 = {{ next_point_positions2|safe }};
-                  next_point_positions3 = {{ next_point_positions3|safe }};
-              } else if (time_from_start2 > time_from_start3) {
-                  next_point_positions2 = {{ next_point_positions3|safe }};
-                  next_point_positions3 = {{ next_point_positions2|safe }};
-              }
-          } else if (time_from_start2 < time_from_start1 && time_from_start2 < time_from_start3) {
-              next_point_positions = {{ next_point_positions2|safe }};
-              if (time_from_start1 < time_from_start3) {
-                  next_point_positions2 = {{ next_point_positions1|safe }};
-                  next_point_positions3 = {{ next_point_positions3|safe }};
-              } else if (time_from_start1 > time_from_start3) {
-                  next_point_positions2 = {{ next_point_positions3|safe }};
-                  next_point_positions3 = {{ next_point_positions1|safe }};
-              }
-          } else if (time_from_start3 < time_from_start1 && time_from_start3 < time_from_start2) {
-              next_point_positions = {{ next_point_positions3|safe }};
-              if (time_from_start1 < time_from_start2) {
-                  next_point_positions2 = {{ next_point_positions1|safe }};
-                  next_point_positions3 = {{ next_point_positions2|safe }};
-              } else if (time_from_start1 > time_from_start2) {
-                  next_point_positions2 = {{ next_point_positions2|safe }};
-                  next_point_positions3 = {{ next_point_positions1|safe }};
-              }
-          }
-      }#}
-
-
-
       var avoid_areas = {{ danger_list|safe }};
 
       if (localization_counter === 1) {

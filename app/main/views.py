@@ -127,11 +127,6 @@ def map():
     form = MapForm()
     temp_counter = 0
 
-    # string = routingApi.car_route([11.0, 12.0],
-    #                                 [12.0, 13.0],
-    #                                 [herepy.RouteMode.car, herepy.RouteMode.fastest])
-    # resp = json.loads(string.as_json_string())
-    # response = resp['response']['route'][0]['summary']
     if form.validate_on_submit():
         start_place = form.start_place.data
         start_point = geocoderApi.free_form(start_place)
