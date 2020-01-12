@@ -129,9 +129,18 @@
 
 });
 
+      var time_from_start1 = {{ time_from_start1|safe }};
+      var time_from_start2 = {{ time_from_start2|safe }};
+
+      if (time_from_start1 < time_from_start2) {
+          var next_point_positions = {{ next_point_positions|safe }};
+          var next_point_positions2 = {{ next_point_positions2|safe }};
+      } else {
+          var next_point_positions = {{ next_point_positions2|safe }};
+          var next_point_positions2 = {{ next_point_positions|safe }};
+      }
+
       var start_point_positions = {{ start_point_positions|safe }};
-      var next_point_positions = {{ next_point_positions|safe }};
-      var next_point_positions2 = {{ next_point_positions2|safe }};
       var next_point_positions3 = {{ next_point_positions3|safe }};
       var next_point_positions4 = {{ next_point_positions4|safe }};
       var next_point_positions5 = {{ next_point_positions5|safe }};

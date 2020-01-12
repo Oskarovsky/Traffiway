@@ -113,6 +113,15 @@ def edit_profile_admin(id):
     return render_template('edit_profile.html', form=form, user=user)
 
 
+def calculate_route(first_lat, first_lon, second_lat, second_lon):
+    distance_request = routingApi.car_route([first_lat, first_lon],
+                                             [second_lat, second_lon],
+                                             [herepy.RouteMode.car, herepy.RouteMode.fastest])
+    response_json = json.loads(distance_request.as_json_string())
+    response = response_json['response']['route'][0]['summary']
+    return response['travelTime'], response['distance'], response
+
+
 @main.route('/map', methods=['GET', 'POST'])
 def map():
     form = MapForm()
@@ -137,15 +146,12 @@ def map():
         next_point_positions = str(next_dict_json['Latitude']) + ',' + str(next_dict_json['Longitude'])
         temp_counter += 1
 
-        distance_request1 = routingApi.car_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-                                      [next_dict_json['Latitude'], next_dict_json['Longitude']],
-                                      [herepy.RouteMode.car, herepy.RouteMode.fastest])
-        resp1 = json.loads(distance_request1.as_json_string())
-        response = resp1['response']['route'][0]['summary']
-
-        distance_from_start = response['distance']
-        time_from_start = response['travelTime']
-        print(distance_from_start, time_from_start)
+        route_between_info1 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
+                        next_dict_json['Latitude'], next_dict_json['Longitude'])
+        time_from_start1 = route_between_info1[0]
+        distance_from_start1 = route_between_info1[1]
+        response = route_between_info1[2]
+        print(time_from_start1, distance_from_start1)
 
         next_place2 = form.next_place2.data or None
         next_point_positions2 = None
@@ -155,6 +161,13 @@ def map():
             next_dict2_json = next_dict2['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
             next_point_positions2 = str(next_dict2_json['Latitude']) + ',' + str(next_dict2_json['Longitude'])
             temp_counter += 1
+
+            route_between_info2 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
+                                                 next_dict2_json['Latitude'], next_dict2_json['Longitude'])
+            time_from_start2 = route_between_info2[0]
+            distance_from_start2 = route_between_info2[1]
+            response2 = route_between_info2[2]
+            print(time_from_start2, distance_from_start2)
 
         next_place3 = form.next_place3.data or None
         next_point_positions3 = None
@@ -220,6 +233,8 @@ def map():
                                all_dangers=all_dangers, localization_counter=temp_counter,
                                #danger_list_center=json.dumps(danger_list_center),
                                next_point_positions=json.dumps(next_point_positions),
+                               time_from_start1=json.dumps(time_from_start1) or None,
+                               time_from_start2=json.dumps(time_from_start2) or None,
                                next_point_positions2=json.dumps(next_point_positions2) or None,
                                next_point_positions3=json.dumps(next_point_positions3) or None,
                                next_point_positions4=json.dumps(next_point_positions4) or None,
