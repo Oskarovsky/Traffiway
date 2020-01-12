@@ -57,7 +57,7 @@
 
 
         // Create the default UI:
-        var ui = H.ui.UI.createDefault(map, maptypes, 'pl-PL');
+        var ui = H.ui.UI.createDefault(map, maptypes, 'en-US');
         var mapSettings = ui.getControl('mapsettings');
         var zoom = ui.getControl('zoom');
         var scalebar = ui.getControl('scalebar');
@@ -94,6 +94,34 @@
         {#// Add the marker to the map and center the map at the location of the marker:#}
         {#map.addObject(marker);#}
 
+          var geocodingParams = {
+          searchText: 'Warszawa, Polaka 3'
+        };
+
+          var onResult = function(result) {
+          var locations = result.Response.View[0].Result,
+              position,
+              marker;
+          // Add a marker for each location found
+          for (i = 0;  i < locations.length; i++) {
+            position = {
+              lat: locations[i].Location.DisplayPosition.Latitude,
+              lng: locations[i].Location.DisplayPosition.Longitude
+            };
+            marker = new H.map.Marker(position);
+            map.addObject(marker);
+          }
+        };
+
+        // Get an instance of the geocoding service:
+        var geocoder = platform.getGeocodingService();
+
+        // Call the geocode method with the geocoding parameters,
+        // the callback and an error callback function (called if a
+        // communication error occurs):
+        geocoder.geocode(geocodingParams, onResult, function(e) {
+          alert(e);
+});
 
 
 });
@@ -101,25 +129,45 @@
       var start_point_positions = {{ start_point_positions|safe }};
       var next_point_positions = {{ next_point_positions|safe }};
       var next_point_positions2 = {{ next_point_positions2|safe }};
+      var localization_counter = {{ localization_counter|safe }};
       {#var next_point_positions3 = {{ next_point_positions3|safe }};#}
 
       var avoid_areas = {{ danger_list|safe }};
 
-      var routingParameters = {
-      // The routing mode:
-      'mode': 'fastest;car',
-      // The start point of the route:
-      'waypoint0': 'geo!' + start_point_positions,
-      // The end point of the route:
-      'waypoint1': 'geo!' + next_point_positions,
-      'waypoint2': 'geo!' + next_point_positions2,
-      //'waypoint3': 'geo!' + next_point_positions3,
-      // To retrieve the shape of the route we choose the route
-      // representation mode 'display'
-      'representation': 'display',
-      // areas which transport should avoid
-      'avoidareas': avoid_areas
-      };
+      if (localization_counter === 1) {
+          var routingParameters = {
+              // The routing mode:
+              'mode': 'fastest;car',
+              // The start point of the route:
+              'waypoint0': 'geo!' + start_point_positions,
+              // The end point of the route:
+              'waypoint1': 'geo!' + next_point_positions,
+              //'waypoint2': 'geo!' + next_point_positions2,
+              //'waypoint3': 'geo!' + next_point_positions3,
+              // To retrieve the shape of the route we choose the route
+              // representation mode 'display'
+              'representation': 'display',
+              // areas which transport should avoid
+              'avoidareas': avoid_areas
+              };
+      } else {
+          var routingParameters = {
+              // The routing mode:
+              'mode': 'fastest;car',
+              // The start point of the route:
+              'waypoint0': 'geo!' + start_point_positions,
+              // The end point of the route:
+              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint2': 'geo!' + next_point_positions2,
+              //'waypoint3': 'geo!' + next_point_positions3,
+              // To retrieve the shape of the route we choose the route
+              // representation mode 'display'
+              'representation': 'display',
+              // areas which transport should avoid
+              'avoidareas': avoid_areas
+              };
+      }
+
 
       // Define a callback function to process the routing response:
     var onResult = function(result) {
@@ -145,25 +193,48 @@
             });
 
             // Retrieve the mapped positions of the requested waypoints:
-            startPoint = route.waypoint[0].mappedPosition;
-            endPoint = route.waypoint[1].mappedPosition;
+            if (localization_counter === 1) {
+                startPoint = route.waypoint[0].mappedPosition;
+                endPoint = route.waypoint[1].mappedPosition;
+                            // Create a marker for the start point:
+                var startMarker = new H.map.Marker({
+                    lat: startPoint.latitude,
+                    lng: startPoint.longitude
+                });
+
+                // Create a marker for the end point:
+                var endMarker = new H.map.Marker({
+                    lat: endPoint.latitude,
+                    lng: endPoint.longitude
+                });
+            } else {
+                startPoint = route.waypoint[0].mappedPosition;
+                medPoint = route.waypoint[1].mappedPosition;
+                endPoint = route.waypoint[2].mappedPosition;
+                            // Create a marker for the start point:
+                var startMarker = new H.map.Marker({
+                    lat: startPoint.latitude,
+                    lng: startPoint.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker = new H.map.Marker({
+                    lat: medPoint.latitude,
+                    lng: medPoint.longitude
+                });
+
+                // Create a marker for the end point:
+                var endMarker = new H.map.Marker({
+                    lat: endPoint.latitude,
+                    lng: endPoint.longitude
+                });
+            }
 
             // Create a polyline to display the route:
             //var routeLine = new H.map.Polyline(linestring, {
             //style: {strokeColor: 'blue', lineWidth: 3}
             //});
 
-            // Create a marker for the start point:
-            var startMarker = new H.map.Marker({
-                lat: startPoint.latitude,
-                lng: startPoint.longitude
-            });
-
-            // Create a marker for the end point:
-            var endMarker = new H.map.Marker({
-                lat: endPoint.latitude,
-                lng: endPoint.longitude
-            });
 
             // Create an outline for the route polyline:
             var routeOutline = new H.map.Polyline(linestring, {
@@ -191,8 +262,14 @@
             var routeLine = new H.map.Group();
             routeLine.addObjects([routeOutline, routeArrows]);
 
-            // Add the route polyline and the two markers to the map:
-            map.addObjects([routeLine, startMarker, endMarker]);
+            if (localization_counter === 1) {
+               // Add the route polyline and the two markers to the map:
+                map.addObjects([routeLine, startMarker, endMarker]);
+            } else {
+                // Add the route polyline and the two markers to the map:
+                map.addObjects([routeLine, startMarker, endMarker, medMarker]);
+            }
+
 
             // Set the map's viewport to make the whole route visible:
             map.getViewModel().setLookAtData({bounds: routeLine.getBoundingBox()});

@@ -173,6 +173,7 @@ def map():
 
         return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, response=response,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
+                               all_dangers=all_dangers, localization_counter=temp_counter,
                                #danger_list_center=json.dumps(danger_list_center),
                                next_point_positions=json.dumps(next_point_positions),
                                next_point_positions2=json.dumps(next_point_positions2) or None,
