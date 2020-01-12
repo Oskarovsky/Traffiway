@@ -153,31 +153,31 @@ def map():
         danger_list = '!'.join(all_dangers)
         print(danger_list)
 
-        if temp_counter == 1:
-            response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-                                                     [next_dict_json['Latitude'], next_dict_json['Longitude']],
-                                                     [herepy.RouteMode.car, herepy.RouteMode.fastest])
-        if temp_counter == 2:
-            response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-                                                     [next_dict_json['Latitude'], next_dict_json['Longitude']],
-                                                     [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
-                                                     [herepy.RouteMode.car, herepy.RouteMode.fastest])
+        # if temp_counter == 1:
+        #     response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
+        #                                              [next_dict_json['Latitude'], next_dict_json['Longitude']],
+        #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
+        # if temp_counter == 2:
+        #     response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
+        #                                              [next_dict_json['Latitude'], next_dict_json['Longitude']],
+        #                                              [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
+        #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
 
-        if temp_counter == 3:
-            response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-                                                     [next_dict_json['Latitude'], next_dict_json['Longitude']],
-                                                     [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
-                                                     [next_dict3_json['Latitude'], next_dict3_json['Longitude']],
-                                                     [herepy.RouteMode.car, herepy.RouteMode.fastest])
+        # if temp_counter == 3:
+        #     response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
+        #                                              [next_dict_json['Latitude'], next_dict_json['Longitude']],
+        #                                              [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
+        #                                              [next_dict3_json['Latitude'], next_dict3_json['Longitude']],
+        #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
 
 
-        return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, response=response,
+        return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, #response=response,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
                                #danger_list_center=json.dumps(danger_list_center),
                                next_point_positions=json.dumps(next_point_positions),
                                next_point_positions2=json.dumps(next_point_positions2) or None,
-                               next_point_position3=json.dumps(next_point_positions3) or None)
+                               next_point_positions3=json.dumps(next_point_positions3) or None)
     return render_template('map.html', form=form)
 
 
