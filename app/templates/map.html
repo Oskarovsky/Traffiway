@@ -132,8 +132,11 @@
       var start_point_positions = {{ start_point_positions|safe }};
       var next_point_positions = {{ next_point_positions|safe }};
       var next_point_positions2 = {{ next_point_positions2|safe }};
-      var localization_counter = {{ localization_counter|safe }};
       var next_point_positions3 = {{ next_point_positions3|safe }};
+      var next_point_positions4 = {{ next_point_positions4|safe }};
+      var next_point_positions5 = {{ next_point_positions5|safe }};
+      var next_point_positions6 = {{ next_point_positions6|safe }};
+      var localization_counter = {{ localization_counter|safe }};
 
       var avoid_areas = {{ danger_list|safe }};
 
@@ -176,6 +179,60 @@
               'waypoint1': 'geo!' + next_point_positions,
               'waypoint2': 'geo!' + next_point_positions2,
               'waypoint3': 'geo!' + next_point_positions3,
+              // To retrieve the shape of the route we choose the route
+              // representation mode 'display'
+              'representation': 'display',
+              // areas which transport should avoid
+              'avoidareas': avoid_areas
+              };
+      } else if (localization_counter === 4) {
+          var routingParameters = {
+              // The routing mode:
+              'mode': 'fastest;car',
+              // The start point of the route:
+              'waypoint0': 'geo!' + start_point_positions,
+              // The end point of the route:
+              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint2': 'geo!' + next_point_positions2,
+              'waypoint3': 'geo!' + next_point_positions3,
+              'waypoint4': 'geo!' + next_point_positions4,
+              // To retrieve the shape of the route we choose the route
+              // representation mode 'display'
+              'representation': 'display',
+              // areas which transport should avoid
+              'avoidareas': avoid_areas
+              };
+      } else if (localization_counter === 5) {
+          var routingParameters = {
+              // The routing mode:
+              'mode': 'fastest;car',
+              // The start point of the route:
+              'waypoint0': 'geo!' + start_point_positions,
+              // The end point of the route:
+              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint2': 'geo!' + next_point_positions2,
+              'waypoint3': 'geo!' + next_point_positions3,
+              'waypoint4': 'geo!' + next_point_positions4,
+              'waypoint5': 'geo!' + next_point_positions5,
+              // To retrieve the shape of the route we choose the route
+              // representation mode 'display'
+              'representation': 'display',
+              // areas which transport should avoid
+              'avoidareas': avoid_areas
+              };
+      } else if (localization_counter === 6) {
+          var routingParameters = {
+              // The routing mode:
+              'mode': 'fastest;car',
+              // The start point of the route:
+              'waypoint0': 'geo!' + start_point_positions,
+              // The end point of the route:
+              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint2': 'geo!' + next_point_positions2,
+              'waypoint3': 'geo!' + next_point_positions3,
+              'waypoint4': 'geo!' + next_point_positions4,
+              'waypoint5': 'geo!' + next_point_positions5,
+              'waypoint6': 'geo!' + next_point_positions6,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
@@ -272,6 +329,132 @@
                     lat: endPoint.latitude,
                     lng: endPoint.longitude
                 });
+            } else if (localization_counter === 4) {
+                startPoint = route.waypoint[0].mappedPosition;
+                medPoint1 = route.waypoint[1].mappedPosition;
+                medPoint2 = route.waypoint[2].mappedPosition;
+                medPoint3 = route.waypoint[3].mappedPosition;
+                endPoint = route.waypoint[4].mappedPosition;
+                            // Create a marker for the start point:
+                var startMarker = new H.map.Marker({
+                    lat: startPoint.latitude,
+                    lng: startPoint.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker1 = new H.map.Marker({
+                    lat: medPoint1.latitude,
+                    lng: medPoint1.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker2 = new H.map.Marker({
+                    lat: medPoint2.latitude,
+                    lng: medPoint2.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker3 = new H.map.Marker({
+                    lat: medPoint3.latitude,
+                    lng: medPoint3.longitude
+                });
+
+                // Create a marker for the end point:
+                var endMarker = new H.map.Marker({
+                    lat: endPoint.latitude,
+                    lng: endPoint.longitude
+                });
+            } else if (localization_counter === 5) {
+                startPoint = route.waypoint[0].mappedPosition;
+                medPoint1 = route.waypoint[1].mappedPosition;
+                medPoint2 = route.waypoint[2].mappedPosition;
+                medPoint3 = route.waypoint[3].mappedPosition;
+                medPoint4 = route.waypoint[4].mappedPosition;
+                endPoint = route.waypoint[5].mappedPosition;
+                            // Create a marker for the start point:
+                var startMarker = new H.map.Marker({
+                    lat: startPoint.latitude,
+                    lng: startPoint.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker1 = new H.map.Marker({
+                    lat: medPoint1.latitude,
+                    lng: medPoint1.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker2 = new H.map.Marker({
+                    lat: medPoint2.latitude,
+                    lng: medPoint2.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker3 = new H.map.Marker({
+                    lat: medPoint3.latitude,
+                    lng: medPoint3.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker4 = new H.map.Marker({
+                    lat: medPoint4.latitude,
+                    lng: medPoint4.longitude
+                });
+
+                // Create a marker for the end point:
+                var endMarker = new H.map.Marker({
+                    lat: endPoint.latitude,
+                    lng: endPoint.longitude
+                });
+            } else if (localization_counter === 6) {
+                startPoint = route.waypoint[0].mappedPosition;
+                medPoint1 = route.waypoint[1].mappedPosition;
+                medPoint2 = route.waypoint[2].mappedPosition;
+                medPoint3 = route.waypoint[3].mappedPosition;
+                medPoint4 = route.waypoint[4].mappedPosition;
+                medPoint5 = route.waypoint[5].mappedPosition;
+                endPoint = route.waypoint[6].mappedPosition;
+                            // Create a marker for the start point:
+                var startMarker = new H.map.Marker({
+                    lat: startPoint.latitude,
+                    lng: startPoint.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker1 = new H.map.Marker({
+                    lat: medPoint1.latitude,
+                    lng: medPoint1.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker2 = new H.map.Marker({
+                    lat: medPoint2.latitude,
+                    lng: medPoint2.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker3 = new H.map.Marker({
+                    lat: medPoint3.latitude,
+                    lng: medPoint3.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker4 = new H.map.Marker({
+                    lat: medPoint4.latitude,
+                    lng: medPoint4.longitude
+                });
+
+                // Create a marker for the medium point:
+                var medMarker5 = new H.map.Marker({
+                    lat: medPoint5.latitude,
+                    lng: medPoint5.longitude
+                });
+
+                // Create a marker for the end point:
+                var endMarker = new H.map.Marker({
+                    lat: endPoint.latitude,
+                    lng: endPoint.longitude
+                });
             }
 
             // Create a polyline to display the route:
@@ -314,7 +497,16 @@
                 map.addObjects([routeLine, startMarker, endMarker, medMarker1]);
             } else if (localization_counter === 3) {
                 // Add the route polyline and the two markers to the map:
-                map.addObjects([routeLine, startMarker, endMarker, medMarker2]);
+                map.addObjects([routeLine, startMarker, endMarker, medMarker1, medMarker2]);
+            } else if (localization_counter === 4) {
+                // Add the route polyline and the two markers to the map:
+                map.addObjects([routeLine, startMarker, endMarker, medMarker1, medMarker2, medMarker3]);
+            } else if (localization_counter === 5) {
+                // Add the route polyline and the two markers to the map:
+                map.addObjects([routeLine, startMarker, endMarker, medMarker1, medMarker2, medMarker3, medMarker4]);
+            } else if (localization_counter === 6) {
+                // Add the route polyline and the two markers to the map:
+                map.addObjects([routeLine, startMarker, endMarker, medMarker1, medMarker2, medMarker3, medMarker4, medMarker5]);
             }
 
 

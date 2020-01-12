@@ -1,5 +1,6 @@
 import json
 import tempfile
+import googlemaps
 
 import herepy
 from datetime import datetime
@@ -19,7 +20,7 @@ from ..email import send_email
 
 geocoderApi = herepy.GeocoderApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
 routingApi = herepy.RoutingApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
-response = geocoderApi.free_form('200 S Mathilda Sunnyvale CA')
+gmaps = googlemaps.Client(key='AIzaSyDIhA2HHd3CCdIQjkSWqFUH3Tw-KFzfz-A')
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -116,6 +117,12 @@ def edit_profile_admin(id):
 def map():
     form = MapForm()
     temp_counter = 0
+
+    # string = routingApi.car_route([11.0, 12.0],
+    #                                 [12.0, 13.0],
+    #                                 [herepy.RouteMode.car, herepy.RouteMode.fastest])
+    # resp = json.loads(string.as_json_string())
+    # response = resp['response']['route'][0]['summary']
     if form.validate_on_submit():
         start_place = form.start_place.data
         start_point = geocoderApi.free_form(start_place)
@@ -129,6 +136,16 @@ def map():
         next_dict_json = next_dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
         next_point_positions = str(next_dict_json['Latitude']) + ',' + str(next_dict_json['Longitude'])
         temp_counter += 1
+
+        distance_request1 = routingApi.car_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
+                                      [next_dict_json['Latitude'], next_dict_json['Longitude']],
+                                      [herepy.RouteMode.car, herepy.RouteMode.fastest])
+        resp1 = json.loads(distance_request1.as_json_string())
+        response = resp1['response']['route'][0]['summary']
+
+        distance_from_start = response['distance']
+        time_from_start = response['travelTime']
+        print(distance_from_start, time_from_start)
 
         next_place2 = form.next_place2.data or None
         next_point_positions2 = None
@@ -146,6 +163,33 @@ def map():
             next_dict3 = json.loads(next_point3.as_json_string())
             next_dict3_json = next_dict3['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
             next_point_positions3 = str(next_dict3_json['Latitude']) + ',' + str(next_dict3_json['Longitude'])
+            temp_counter += 1
+
+        next_place4 = form.next_place4.data or None
+        next_point_positions4 = None
+        if next_place4 is not None:
+            next_point4 = geocoderApi.free_form(next_place4)
+            next_dict4 = json.loads(next_point4.as_json_string())
+            next_dict4_json = next_dict4['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+            next_point_positions4 = str(next_dict4_json['Latitude']) + ',' + str(next_dict4_json['Longitude'])
+            temp_counter += 1
+
+        next_place5 = form.next_place5.data or None
+        next_point_positions5 = None
+        if next_place5 is not None:
+            next_point5 = geocoderApi.free_form(next_place5)
+            next_dict5 = json.loads(next_point5.as_json_string())
+            next_dict5_json = next_dict5['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+            next_point_positions5 = str(next_dict5_json['Latitude']) + ',' + str(next_dict5_json['Longitude'])
+            temp_counter += 1
+
+        next_place6 = form.next_place6.data or None
+        next_point_positions6 = None
+        if next_place6 is not None:
+            next_point6 = geocoderApi.free_form(next_place6)
+            next_dict6 = json.loads(next_point6.as_json_string())
+            next_dict6_json = next_dict6['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+            next_point_positions6 = str(next_dict6_json['Latitude']) + ',' + str(next_dict6_json['Longitude'])
             temp_counter += 1
 
 
@@ -171,13 +215,16 @@ def map():
         #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
 
 
-        return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, #response=response,
+        return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, response=response,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
                                #danger_list_center=json.dumps(danger_list_center),
                                next_point_positions=json.dumps(next_point_positions),
                                next_point_positions2=json.dumps(next_point_positions2) or None,
-                               next_point_positions3=json.dumps(next_point_positions3) or None)
+                               next_point_positions3=json.dumps(next_point_positions3) or None,
+                               next_point_positions4=json.dumps(next_point_positions4) or None,
+                               next_point_positions5=json.dumps(next_point_positions5) or None,
+                               next_point_positions6=json.dumps(next_point_positions6) or None)
     return render_template('map.html', form=form)
 
 
