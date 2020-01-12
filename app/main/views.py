@@ -155,6 +155,7 @@ def map():
 
         next_place2 = form.next_place2.data or None
         next_point_positions2 = None
+        time_from_start2 = None
         if next_place2 is not None:
             next_point2 = geocoderApi.free_form(next_place2)
             next_dict2 = json.loads(next_point2.as_json_string())
@@ -171,12 +172,20 @@ def map():
 
         next_place3 = form.next_place3.data or None
         next_point_positions3 = None
+        time_from_start3 = None
         if next_place3 is not None:
             next_point3 = geocoderApi.free_form(next_place3)
             next_dict3 = json.loads(next_point3.as_json_string())
             next_dict3_json = next_dict3['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
             next_point_positions3 = str(next_dict3_json['Latitude']) + ',' + str(next_dict3_json['Longitude'])
             temp_counter += 1
+
+            route_between_info3 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
+                                                  next_dict3_json['Latitude'], next_dict3_json['Longitude'])
+            time_from_start3 = route_between_info3[0]
+            distance_from_start3 = route_between_info3[1]
+            response3 = route_between_info3[2]
+            print(time_from_start3, distance_from_start3)
 
         next_place4 = form.next_place4.data or None
         next_point_positions4 = None
@@ -235,6 +244,7 @@ def map():
                                next_point_positions=json.dumps(next_point_positions),
                                time_from_start1=json.dumps(time_from_start1) or None,
                                time_from_start2=json.dumps(time_from_start2) or None,
+                               time_from_start3=json.dumps(time_from_start3) or None,
                                next_point_positions2=json.dumps(next_point_positions2) or None,
                                next_point_positions3=json.dumps(next_point_positions3) or None,
                                next_point_positions4=json.dumps(next_point_positions4) or None,
