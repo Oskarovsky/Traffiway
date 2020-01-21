@@ -128,7 +128,7 @@ def calculate_route(first_lat, first_lon, second_lat, second_lon):
 @login_required
 def add_item():
     form = ItemForm()
-    available_journeys = Journey.query.all()
+    available_journeys = Journey.query.filter(Journey.author_id == current_user.id)
     journey_list = [(j.id, j.destination) for j in available_journeys]
     form.journey_id.choices = journey_list
     if form.validate_on_submit():
@@ -250,23 +250,10 @@ def map():
         danger_list = '!'.join(all_dangers)
         print(danger_list)
 
-        # if temp_counter == 1:
-        #     response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-        #                                              [next_dict_json['Latitude'], next_dict_json['Longitude']],
-        #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
-        # if temp_counter == 2:
-        #     response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-        #                                              [next_dict_json['Latitude'], next_dict_json['Longitude']],
-        #                                              [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
-        #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
-
-        # if temp_counter == 3:
-        #     response = routingApi.intermediate_route([start_dict_json['Latitude'], start_dict_json['Longitude']],
-        #                                              [next_dict_json['Latitude'], next_dict_json['Longitude']],
-        #                                              [next_dict2_json['Latitude'], next_dict2_json['Longitude']],
-        #                                              [next_dict3_json['Latitude'], next_dict3_json['Longitude']],
-        #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
-
+        journey = Journey(start_localization=form.start_place.data, start_time=form.start_time.data,
+                          destination=form.next_place1.data, author_id=current_user.id)
+        db.session.add(journey)
+        db.session.commit()
 
         return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict1_json, response=response,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),

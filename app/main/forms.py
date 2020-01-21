@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField, FloatField
+from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField, FloatField, DateTimeField
 from wtforms.validators import DataRequired, Length, Email, Regexp, ValidationError
 
 from app.models import Role, User
@@ -69,7 +69,5 @@ class MapForm(FlaskForm):
     next_place4 = StringField('Next place4', validators=[Length(0, 64)])
     next_place5 = StringField('Next place5', validators=[Length(0, 64)])
     next_place6 = StringField('Next place6', validators=[Length(0, 64)])
-    #next_place7 = StringField('Next place7', validators=[Length(0, 64)])
-    #next_place8 = StringField('Next place8', validators=[Length(0, 64)])
-    #next_place9 = StringField('Next place9', validators=[Length(0, 64)])
+    start_time = DateTimeField('Start time',  format='%Y-%m-%d %H:%M')
     submit = SubmitField('Show')
