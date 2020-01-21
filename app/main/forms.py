@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField
+from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField, FloatField
 from wtforms.validators import DataRequired, Length, Email, Regexp, ValidationError
 
 from app.models import Role, User
@@ -50,9 +50,20 @@ class PostForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class ItemForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(0, 64)])
+    info = TextAreaField('Additional info')
+    weight = FloatField('Weight [kg]')
+    length = FloatField('Length [m]')
+    width = FloatField('Width [m]')
+    height = FloatField('Height [m]')
+    journey_id = SelectField(u'Journey', coerce=int)
+    submit = SubmitField('Submit')
+
+
 class MapForm(FlaskForm):
     start_place = StringField('Start place', validators=[DataRequired(), Length(0, 64)])
-    next_place = StringField('Next place', validators=[DataRequired(), Length(0, 64)])
+    next_place1 = StringField('Next place', validators=[DataRequired(), Length(0, 64)])
     next_place2 = StringField('Next place2', validators=[Length(0, 64)])
     next_place3 = StringField('Next place3', validators=[Length(0, 64)])
     next_place4 = StringField('Next place4', validators=[Length(0, 64)])

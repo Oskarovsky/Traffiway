@@ -4,18 +4,20 @@ import googlemaps
 
 import herepy
 from datetime import datetime
+from sqlalchemy import text
 
 import requests
 
 from flask import render_template, session, redirect, url_for, current_app, flash, request, jsonify
 from flask_login import login_required, current_user
+from wtforms import ValidationError
 
 from . import main
-from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, MapForm
+from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, MapForm, ItemForm
 
 from .. import db
 from ..decorators import admin_required
-from ..models import User, Role, Post, Danger
+from ..models import User, Role, Post, Danger, Item, Journey
 from ..email import send_email
 
 geocoderApi = herepy.GeocoderApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
@@ -122,6 +124,24 @@ def calculate_route(first_lat, first_lon, second_lat, second_lon):
     return response['travelTime'], response['distance'], response
 
 
+@main.route('/package', methods=['GET', 'POST'])
+@login_required
+def add_item():
+    form = ItemForm()
+    available_journeys = Journey.query.all()
+    journey_list = [(j.id, j.destination) for j in available_journeys]
+    form.journey_id.choices = journey_list
+    if form.validate_on_submit():
+        item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
+                    width=form.width.data, height=form.height.data, journey_id=form.journey_id.id,
+                    author_id=current_user.id)
+        db.session.add(item)
+        db.session.commit()
+        return redirect(url_for('.index'))
+    return render_template('item.html', form=form)
+
+
+
 @main.route('/map', methods=['GET', 'POST'])
 def map():
     form = MapForm()
@@ -134,23 +154,24 @@ def map():
         start_dict_json = start_dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
         start_point_positions = str(start_dict_json['Latitude']) + ',' + str(start_dict_json['Longitude'])
 
-        next_place = form.next_place.data
-        next_point = geocoderApi.free_form(next_place)
-        next_dict = json.loads(next_point.as_json_string())
-        next_dict_json = next_dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-        next_point_positions = str(next_dict_json['Latitude']) + ',' + str(next_dict_json['Longitude'])
+        next_place1 = form.next_place1.data
+        next_point1 = geocoderApi.free_form(next_place1)
+        next_dict1 = json.loads(next_point1.as_json_string())
+        next_dict1_json = next_dict1['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+        next_point_positions1 = str(next_dict1_json['Latitude']) + ',' + str(next_dict1_json['Longitude'])
         temp_counter += 1
 
-        route_between_info1 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
-                        next_dict_json['Latitude'], next_dict_json['Longitude'])
-        time_from_start1 = route_between_info1[0]
-        distance_from_start1 = route_between_info1[1]
-        response = route_between_info1[2]
-        print(time_from_start1, distance_from_start1)
+        route_between_start_and_point1 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
+                        next_dict1_json['Latitude'], next_dict1_json['Longitude'])
+        time_from_start_to_point1 = route_between_start_and_point1[0]
+        distance_from_start_to_point1 = route_between_start_and_point1[1]
+        response = route_between_start_and_point1[2]
+        print(time_from_start_to_point1, distance_from_start_to_point1)
 
         next_place2 = form.next_place2.data or None
         next_point_positions2 = None
-        time_from_start2 = None
+        time_from_start_to_point2 = None
+        time_from_point1_to_point2 = None
         if next_place2 is not None:
             next_point2 = geocoderApi.free_form(next_place2)
             next_dict2 = json.loads(next_point2.as_json_string())
@@ -158,16 +179,24 @@ def map():
             next_point_positions2 = str(next_dict2_json['Latitude']) + ',' + str(next_dict2_json['Longitude'])
             temp_counter += 1
 
-            route_between_info2 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
+            route_between_start_and_point2 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
                                                  next_dict2_json['Latitude'], next_dict2_json['Longitude'])
-            time_from_start2 = route_between_info2[0]
-            distance_from_start2 = route_between_info2[1]
-            response2 = route_between_info2[2]
-            print(time_from_start2, distance_from_start2)
+            time_from_start_to_point2 = route_between_start_and_point2[0]
+            distance_from_start_to_point2 = route_between_start_and_point2[1]
+            response2 = route_between_start_and_point2[2]
+            print(time_from_start_to_point2, distance_from_start_to_point2)
+
+            route_between_point1_and_point2 = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
+                        next_dict2_json['Latitude'], next_dict2_json['Longitude'])
+            time_from_point1_to_point2 = route_between_point1_and_point2[0]
+            distance_from_point1_to_point2 = route_between_point1_and_point2[1]
+            print(time_from_point1_to_point2, distance_from_point1_to_point2)
 
         next_place3 = form.next_place3.data or None
         next_point_positions3 = None
-        time_from_start3 = None
+        time_from_start_to_point3 = None
+        time_from_point1_to_point3 = None
+        time_from_point2_to_point3 = None
         if next_place3 is not None:
             next_point3 = geocoderApi.free_form(next_place3)
             next_dict3 = json.loads(next_point3.as_json_string())
@@ -175,12 +204,19 @@ def map():
             next_point_positions3 = str(next_dict3_json['Latitude']) + ',' + str(next_dict3_json['Longitude'])
             temp_counter += 1
 
-            route_between_info3 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
+            route_between_start_and_point3 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
                                                   next_dict3_json['Latitude'], next_dict3_json['Longitude'])
-            time_from_start3 = route_between_info3[0]
-            distance_from_start3 = route_between_info3[1]
-            response3 = route_between_info3[2]
-            print(time_from_start3, distance_from_start3)
+            time_from_start_to_point3 = route_between_start_and_point3[0]
+            distance_from_start_to_point3 = route_between_start_and_point3[1]
+            response3 = route_between_start_and_point3[2]
+            print(time_from_start_to_point3, distance_from_start_to_point3)
+
+            route_between_point1_and_point3 = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
+                                                             next_dict3_json['Latitude'], next_dict3_json['Longitude'])
+            time_from_point1_to_point3 = route_between_point1_and_point3[0]
+            distance_from_point2_to_point3 = route_between_point1_and_point3[1]
+            response2 = route_between_point1_and_point3[2]
+            print(time_from_point1_to_point3, distance_from_point2_to_point3)
 
         next_place4 = form.next_place4.data or None
         next_point_positions4 = None
@@ -232,14 +268,17 @@ def map():
         #                                              [herepy.RouteMode.car, herepy.RouteMode.fastest])
 
 
-        return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict_json, response=response,
+        return render_template('map.html', form=form, start_point=start_dict_json, next_point=next_dict1_json, response=response,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
                                #danger_list_center=json.dumps(danger_list_center),
-                               next_point_positions=json.dumps(next_point_positions),
-                               time_from_start1=json.dumps(time_from_start1) or None,
-                               time_from_start2=json.dumps(time_from_start2) or None,
-                               time_from_start3=json.dumps(time_from_start3) or None,
+                               next_point_positions1=json.dumps(next_point_positions1),
+                               time_from_start_to_point1=json.dumps(time_from_start_to_point1) or None,
+                               time_from_start_to_point2=json.dumps(time_from_start_to_point2) or None,
+                               time_from_start_to_point3=json.dumps(time_from_start_to_point3) or None,
+                               time_from_point1_to_point2=json.dumps(time_from_point1_to_point2) or None,
+                               time_from_point1_to_point3=json.dumps(time_from_point1_to_point3) or None,
+                               time_from_point2_to_point3=json.dumps(time_from_point2_to_point3) or None,
                                next_point_positions2=json.dumps(next_point_positions2) or None,
                                next_point_positions3=json.dumps(next_point_positions3) or None,
                                next_point_positions4=json.dumps(next_point_positions4) or None,

@@ -240,8 +240,13 @@ class Item(db.Model):
     __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
+    info = db.Column(db.Text)
+    weight = db.Column(db.Float)
+    length = db.Column(db.Float)
+    width = db.Column(db.Float)
+    height = db.Column(db.Float)
     journey_id = db.Column(db.Integer, db.ForeignKey('journeys.id'))
-
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 @login_manager.user_loader

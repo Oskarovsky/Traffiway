@@ -130,57 +130,60 @@
 });
 
 
-      var time_from_start1 = {{ time_from_start1|safe }};
-      var time_from_start2 = {{ time_from_start2|safe }};
-      var time_from_start3 = {{ time_from_start3|safe }};
+      var time_from_start_to_point1 = {{ time_from_start_to_point1|safe }};
+      var time_from_start_to_point2 = {{ time_from_start_to_point2|safe }};
+      var time_from_start_to_point3 = {{ time_from_start_to_point3|safe }};
+
       var localization_counter = {{ localization_counter|safe }};
 
       var start_point_positions = {{ start_point_positions|safe }};
- //     var next_point_positions = {{ next_point_positions|safe }};
+ //     var next_point_positions1 = {{ next_point_positions1|safe }};
 //      var next_point_positions2 = {{ next_point_positions2|safe }};
   //    var next_point_positions3 = {{ next_point_positions3|safe }};
 
       if (localization_counter === 1) {
-          var next_point_positions = {{ next_point_positions|safe }};
+          var next_point_positions1 = {{ next_point_positions1|safe }};
       }
 
       if (localization_counter === 2) {
-        if (time_from_start1 < time_from_start2) {
-          var next_point_positions = {{ next_point_positions|safe }};
+
+        if (time_from_start_to_point1 < time_from_start_to_point2) {
+          var next_point_positions1 = {{ next_point_positions1|safe }};
           var next_point_positions2 = {{ next_point_positions2|safe }};
-        } else if (time_from_start1 > time_from_start2){
-          var next_point_positions = {{ next_point_positions2|safe }};
-          var next_point_positions2 = {{ next_point_positions|safe }};
+        } else if (time_from_start_to_point1 > time_from_start_to_point2){
+          var next_point_positions1 = {{ next_point_positions2|safe }};
+          var next_point_positions2 = {{ next_point_positions1|safe }};
         }
       }
 
       if (localization_counter === 3) {
-          if (time_from_start1 < time_from_start2 && time_from_start1 < time_from_start3) {
-              var next_point_positions = {{ next_point_positions|safe }};
-              if (time_from_start2 < time_from_start3) {
+          var time_from_point1_to_point2 = {{ time_from_point1_to_point2|safe }};
+          if (time_from_start_to_point1 < time_from_start_to_point2 && time_from_start_to_point1 < time_from_start_to_point3) {
+              var next_point_positions1 = {{ next_point_positions1|safe }};
+              if (time_from_start_to_point2 < time_from_start_to_point3) {
                   var next_point_positions2 = {{ next_point_positions2|safe }};
                   var next_point_positions3 = {{ next_point_positions3|safe }};
-              } else if (time_from_start2 > time_from_start3) {
+              } else if (time_from_start_to_point2 > time_from_start_to_point3) {
                   var next_point_positions2 = {{ next_point_positions3|safe }};
                   var next_point_positions3 = {{ next_point_positions2|safe }};
               }
-          } else if (time_from_start2 < time_from_start1 && time_from_start2 < time_from_start3) {
-              var next_point_positions = {{ next_point_positions2|safe }};
-              if (time_from_start1 < time_from_start3) {
-                  var next_point_positions2 = {{ next_point_positions|safe }};
+          } else if (time_from_start_to_point2 < time_from_start_to_point1 && time_from_start_to_point2 < time_from_start_to_point3) {
+              var next_point_positions1 = {{ next_point_positions2|safe }};
+              if (time_from_start_to_point1 < time_from_start_to_point3) {
+                  var next_point_positions2 = {{ next_point_positions1|safe }};
                   var next_point_positions3 = {{ next_point_positions3|safe }};
-              } else if (time_from_start1 > time_from_start3) {
+              } else if (time_from_start_to_point1 > time_from_start_to_point3) {
                   var next_point_positions2 = {{ next_point_positions3|safe }};
-                  var next_point_positions3 = {{ next_point_positions|safe }};
+                  var next_point_positions3 = {{ next_point_positions1|safe }};
               }
-          } else if (time_from_start3 < time_from_start1 && time_from_start3 < time_from_start2) {
-              var next_point_positions = {{ next_point_positions3|safe }};
-              if (time_from_start1 < time_from_start2) {
-                  var next_point_positions2 = {{ next_point_positions|safe }};
+          } else if (time_from_start_to_point3 < time_from_start_to_point1 && time_from_start_to_point3 < time_from_start_to_point2) {
+              var next_point_positions1 = {{ next_point_positions3|safe }};
+              if (time_from_start_to_point1 < time_from_start_to_point2) {
+                  var next_point_positions2 = {{ next_point_positions1|safe }};
                   var next_point_positions3 = {{ next_point_positions2|safe }};
-              } else if (time_from_start1 > time_from_start2) {
+              } else if (time_from_start_to_point1 > time_from_start_to_point2) {
                   var next_point_positions2 = {{ next_point_positions2|safe }};
-                  var next_point_positions3 = {{ next_point_positions|safe }};
+                  var next_point_positions3 = {{ next_point_positions1|safe }};
               }
           }
       }
@@ -205,7 +208,7 @@
               // The start point of the route:
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint1': 'geo!' + next_point_positions1,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
@@ -219,7 +222,7 @@
               // The start point of the route:
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint1': 'geo!' + next_point_positions1,
               'waypoint2': 'geo!' + next_point_positions2,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
@@ -234,7 +237,7 @@
               // The start point of the route:
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint1': 'geo!' + next_point_positions1,
               'waypoint2': 'geo!' + next_point_positions2,
               'waypoint3': 'geo!' + next_point_positions3,
               // To retrieve the shape of the route we choose the route
@@ -250,7 +253,7 @@
               // The start point of the route:
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint1': 'geo!' + next_point_positions1,
               'waypoint2': 'geo!' + next_point_positions2,
               'waypoint3': 'geo!' + next_point_positions3,
               'waypoint4': 'geo!' + next_point_positions4,
@@ -267,7 +270,7 @@
               // The start point of the route:
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint1': 'geo!' + next_point_positions1,
               'waypoint2': 'geo!' + next_point_positions2,
               'waypoint3': 'geo!' + next_point_positions3,
               'waypoint4': 'geo!' + next_point_positions4,
@@ -285,7 +288,7 @@
               // The start point of the route:
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions,
+              'waypoint1': 'geo!' + next_point_positions1,
               'waypoint2': 'geo!' + next_point_positions2,
               'waypoint3': 'geo!' + next_point_positions3,
               'waypoint4': 'geo!' + next_point_positions4,
