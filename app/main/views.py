@@ -133,13 +133,20 @@ def add_item():
     form.journey_id.choices = journey_list
     if form.validate_on_submit():
         item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
-                    width=form.width.data, height=form.height.data, journey_id=form.journey_id.id,
+                    width=form.width.data, height=form.height.data, journey_id=form.journey_id.data,
                     author_id=current_user.id)
         db.session.add(item)
         db.session.commit()
         return redirect(url_for('.index'))
     return render_template('add_item.html', form=form)
 
+
+@main.route('/all-items', methods=['GET'])
+@login_required
+def show_items():
+    available_journeys = Journey.query.filter(Journey.author_id == current_user.id)
+    available_items = Item.query.filter(Item.author_id == current_user.id)
+    return render_template('all_items.html', available_items=available_items, available_journeys=available_journeys)
 
 
 @main.route('/map', methods=['GET', 'POST'])
