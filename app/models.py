@@ -230,6 +230,7 @@ class Danger(db.Model):
 class Journey(db.Model):
     __tablename__ = 'journeys'
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64))
     start_localization = db.Column(db.String(64))
     start_time = db.Column(db.DateTime, index=True)
     destination = db.Column(db.String(64))
