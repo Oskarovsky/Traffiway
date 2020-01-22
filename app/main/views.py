@@ -149,6 +149,14 @@ def show_items():
     return render_template('all_items.html', available_items=available_items, available_journeys=available_journeys)
 
 
+@main.route('/all-routes', methods=['GET'])
+@login_required
+def show_routes():
+    available_journeys = Journey.query.filter(Journey.author_id == current_user.id)
+    available_items = Item.query.filter(Item.author_id == current_user.id)
+    return render_template('all_routes.html', available_items=available_items, available_journeys=available_journeys)
+
+
 @main.route('/map', methods=['GET', 'POST'])
 def map():
     form = MapForm()
