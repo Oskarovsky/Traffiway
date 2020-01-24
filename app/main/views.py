@@ -69,6 +69,14 @@ def user(username):
     return render_template('user.html', user=user, posts=posts, pagination=pagination)
 
 
+@main.route('/route/<int:id>', methods=['GET', 'POST'])
+@login_required
+def show_route(id):
+    route = Journey.query.filter_by(id=id).first_or_404()
+    return render_template('route.html', route=route)
+
+
+
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
