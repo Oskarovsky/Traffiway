@@ -72,3 +72,12 @@ class MapForm(FlaskForm):
     start_time = DateTimeField('Start time',  format='%Y-%m-%d %H:%M')
     title = StringField('Title')
     submit = SubmitField('Show')
+
+
+class CarForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(0, 64)])
+    capacity_length = FloatField('Capacity length [m]', validators=[DataRequired()])
+    capacity_weight = FloatField('Capacity weight [kg]', validators=[DataRequired()])
+    capacity_width = FloatField('Capacity width [m]', validators=[DataRequired()])
+    capacity_height = FloatField('Capacity height [m]', validators=[DataRequired()])
+    submit = SubmitField('Submit')

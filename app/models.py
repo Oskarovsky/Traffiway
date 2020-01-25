@@ -12,6 +12,7 @@ from . import db, login_manager
 
 class Role(db.Model):
     __tablename__ = 'roles'     # defines the name of the table in the database
+    _table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), unique=True)
     default = db.Column(db.Boolean, default=False, index=True)
@@ -232,8 +233,21 @@ class Journey(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64))
     start_localization = db.Column(db.String(64))
+    next_localization1 = db.Column(db.String(64))
+    next_localization2 = db.Column(db.String(64))
+    next_localization3 = db.Column(db.String(64))
+    next_localization4 = db.Column(db.String(64))
+    next_localization5 = db.Column(db.String(64))
+    end_localization = db.Column(db.String(64))
     start_time = db.Column(db.DateTime, index=True)
-    destination = db.Column(db.String(64))
+    start_point_positions = db.Column(db.String(64))
+    end_point_positions = db.Column(db.String(64))
+    next_point_positions1 = db.Column(db.String(64))
+    next_point_positions2 = db.Column(db.String(64))
+    next_point_positions3 = db.Column(db.String(64))
+    next_point_positions4 = db.Column(db.String(64))
+    next_point_positions5 = db.Column(db.String(64))
+    localization_counter = db.Column(db.Integer)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
@@ -245,6 +259,7 @@ class Car(db.Model):
     capacity_weight = db.Column(db.Float)
     capacity_width = db.Column(db.Float)
     capacity_height = db.Column(db.Float)
+    image = db.Column(db.String(64))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
@@ -257,6 +272,8 @@ class Item(db.Model):
     length = db.Column(db.Float)
     width = db.Column(db.Float)
     height = db.Column(db.Float)
+    target = db.Column(db.String(64))
+    image = db.Column(db.String(64))
     journey_id = db.Column(db.Integer, db.ForeignKey('journeys.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 

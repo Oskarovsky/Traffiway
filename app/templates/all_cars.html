@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Traffiway - Your cars{% endblock %}
+
+{% block page_content %}
+
+    <div class="container mb-3 mt-3">
+    <h3>Your fleet</h3>
+        <table class="table table-striped table-bordered" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Weight</th>
+                    <th>Length</th>
+                    <th>Width</th>
+                    <th>Height</th>
+                    <th>Info</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for car in cars %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ car.name }}</td>
+                    <td>{{ car.capacity_weight }}</td>
+                    <td>{{ car.capacity_length }}</td>
+                    <td>{{ car.capacity_height }}</td>
+                    <td>{{ car.capacity_width }}</td>
+                    <td><a href="{{ url_for('.show_car', id=car.id) }}">Show</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="right">
+            <a class="btn btn-default" href="{{ url_for('.add_car') }}">Add vehicle</a>
+        </div>
+    </div>
+
+{% endblock %}

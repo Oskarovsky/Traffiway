@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import googlemaps
 
@@ -11,13 +12,14 @@ import requests
 from flask import render_template, session, redirect, url_for, current_app, flash, request, jsonify
 from flask_login import login_required, current_user
 from wtforms import ValidationError
+from werkzeug.utils import secure_filename
 
 from . import main
-from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, MapForm, ItemForm
+from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, MapForm, ItemForm, CarForm
 
 from .. import db
 from ..decorators import admin_required
-from ..models import User, Role, Post, Danger, Item, Journey
+from ..models import User, Role, Post, Danger, Item, Journey, Car
 from ..email import send_email
 
 geocoderApi = herepy.GeocoderApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
@@ -67,14 +69,6 @@ def user(username):
         error_out=False)
     posts = pagination.items
     return render_template('user.html', user=user, posts=posts, pagination=pagination)
-
-
-@main.route('/route/<int:id>', methods=['GET', 'POST'])
-@login_required
-def show_route(id):
-    route = Journey.query.filter_by(id=id).first_or_404()
-    return render_template('route.html', journey=route)
-
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -132,27 +126,74 @@ def calculate_route(first_lat, first_lon, second_lat, second_lon):
     return response['travelTime'], response['distance'], response
 
 
-@main.route('/package', methods=['GET', 'POST'])
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['UPLOAD_FOLDER']
+
+
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('add_item'))
+
+
+@main.route('/route/<int:journey_id>/package', methods=['GET', 'POST'])
 @login_required
-def add_item():
+def add_item(journey_id):
     form = ItemForm()
-    available_journeys = Journey.query.filter(Journey.author_id == current_user.id)
-    journey_list = [(j.id, j.title) for j in available_journeys]
-    form.journey_id.choices = journey_list
+    points = []
+    end_point = Journey.query.filter_by(id=journey_id).first().end_localization
+    if end_point is not None:
+        points.append([0, end_point])
+    point1 = Journey.query.filter_by(id=journey_id).first().next_localization1
+    if point1 is not None:
+        points.append([1, point1])
+    point2 = Journey.query.filter_by(id=journey_id).first().next_localization2
+    if point2 is not None:
+        points.append([2, point2])
+    point3 = Journey.query.filter_by(id=journey_id).first().next_localization3
+    if point3 is not None:
+        points.append([3, point3])
+    point4 = Journey.query.filter_by(id=journey_id).first().next_localization4
+    if point4 is not None:
+        points.append([4, point4])
+    point5 = Journey.query.filter_by(id=journey_id).first().next_localization5
+    if point5 is not None:
+        points.append([5, point5])
+    available_points = points
+    print(points)
+    points_list = [(j[0], j[1]) for j in available_points]
+    form.journey_id.choices = points_list
     if form.validate_on_submit():
         item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
-                    width=form.width.data, height=form.height.data, journey_id=form.journey_id.data,
+                    width=form.width.data, height=form.height.data, journey_id=journey_id,
                     author_id=current_user.id)
         db.session.add(item)
         db.session.commit()
-        return redirect(url_for('.index'))
+        return redirect(url_for('.show_route', id=journey_id))
     return render_template('add_item.html', form=form)
 
 
 @main.route('/car', methods=['GET', 'POST'])
 @login_required
 def add_car():
-    return render_template('add_car.html')
+    form = CarForm()
+    if form.validate_on_submit():
+        car = Car(name=form.name.data, capacity_height=form.capacity_height.data,
+                  capacity_length=form.capacity_length.data, capacity_weight=form.capacity_weight.data,
+                  capacity_width=form.capacity_width.data, author_id=current_user.id)
+        db.session.add(car)
+        db.session.commit()
+        return redirect(url_for('.show_cars',))
+    return render_template('add_car.html', form=form)
 
 
 @main.route('/all-items', methods=['GET'])
@@ -169,6 +210,30 @@ def show_routes():
     available_journeys = Journey.query.filter(Journey.author_id == current_user.id)
     available_items = Item.query.filter(Item.author_id == current_user.id)
     return render_template('all_routes.html', available_items=available_items, available_journeys=available_journeys)
+
+
+@main.route('/all-cars', methods=['GET'])
+@login_required
+def show_cars():
+    cars = Car.query.filter(Car.author_id == current_user.id)
+    return render_template('all_cars.html', cars=cars)
+
+
+@main.route('/car/<int:id>', methods=['GET', 'POST'])
+@login_required
+def show_car(id):
+    car = Car.query.filter_by(id=id).first_or_404()
+    return render_template('car.html', car=car)
+
+
+@main.route('/route/<int:id>', methods=['GET', 'POST'])
+@login_required
+def show_route(id):
+    route = Journey.query.filter_by(id=id).first_or_404()
+    items = Item.query.filter(Item.journey_id == id).all()
+    all_dangers = [Danger.position for Danger in Danger.query.all()]
+    danger_list = '!'.join(all_dangers)
+    return render_template('route.html', journey=route, items=items, danger_list=json.dumps(danger_list))
 
 
 @main.route('/map', methods=['GET', 'POST'])
@@ -337,9 +402,23 @@ def map():
                     next_point_positions2 = next_point_positions2
                     next_point_positions3 = next_point_positions1
 
-        journey = Journey(start_localization=form.start_place.data, start_time=form.start_time.data,
-                          destination=form.next_place1.data, author_id=current_user.id,
-                          title=form.title.data + ' [' + form.start_place.data + ' - ' + form.next_place1.data + ']')
+        journey = Journey(start_localization=form.start_place.data, end_localization=form.end_place.data,
+                          next_localization1=json.dumps(next_place1) or None,
+                          next_localization2=json.dumps(next_place2) or None,
+                          next_localization3=json.dumps(next_place3) or None,
+                          next_localization4=json.dumps(next_place4) or None,
+                          next_localization5=json.dumps(next_place5) or None,
+                          author_id=current_user.id, start_time=form.start_time.data,
+                          title=form.title.data + ' [' + form.start_place.data + ' - ' + form.end_place.data + ']',
+                          start_point_positions=json.dumps(start_point_positions),
+                          end_point_positions=json.dumps(end_point_positions),
+                          next_point_positions1=json.dumps(next_point_positions1) or None,
+                          next_point_positions2=json.dumps(next_point_positions2) or None,
+                          next_point_positions3=json.dumps(next_point_positions3) or None,
+                          next_point_positions4=json.dumps(next_point_positions4) or None,
+                          next_point_positions5=json.dumps(next_point_positions5) or None,
+                          localization_counter=temp_counter)
+
         db.session.add(journey)
         db.session.commit()
 
@@ -347,7 +426,6 @@ def map():
                                start_point=start_dict_json, next_point=end_dict_json,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
-                               #danger_list_center=json.dumps(danger_list_center),
                                end_point_positions=json.dumps(end_point_positions),
                                time_from_start_to_end=json.dumps(time_from_start_to_end) or None,
                                time_from_start_to_point1=json.dumps(time_from_start_to_point1) or None,

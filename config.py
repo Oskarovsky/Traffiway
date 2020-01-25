@@ -17,6 +17,10 @@ class Config:
     TRAFFIWAY_MAIL_SENDER = 'TraffiWay Admin <traffiway@gmail.com>'
     TRAFFIWAY_ADMIN = os.environ.get('TRAFFIWAY_ADMIN')
     TRAFFIWAY_POSTS_PER_PAGE = 10
+    TRAFFIWAY_ROUTES_PER_PAGE = 20
+
+    UPLOAD_FOLDER = '/app/static/uploads'
+    ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
     HERE_API_KEY = os.environ.get('HERE_API_KEY')
 

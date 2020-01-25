@@ -21,7 +21,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ journey.title }}</td>
                     <td>{{ journey.start_time }}</td>
-                    <td>Show details</td>
+                    <td><a href="{{ url_for('.show_route', id=journey.id) }}">Show details</a></td>
                 </tr>
             {% endfor %}
             </tbody>
