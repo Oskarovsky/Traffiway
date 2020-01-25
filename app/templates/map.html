@@ -130,18 +130,22 @@
 });
 
 
+      var time_from_start_to_end = {{ time_from_start_to_end|safe }};
       var time_from_start_to_point1 = {{ time_from_start_to_point1|safe }};
       var time_from_start_to_point2 = {{ time_from_start_to_point2|safe }};
-      var time_from_start_to_point3 = {{ time_from_start_to_point3|safe }};
 
       var localization_counter = {{ localization_counter|safe }};
 
       var start_point_positions = {{ start_point_positions|safe }};
- //     var next_point_positions1 = {{ next_point_positions1|safe }};
-//      var next_point_positions2 = {{ next_point_positions2|safe }};
-  //    var next_point_positions3 = {{ next_point_positions3|safe }};
+      var end_point_positions = {{ end_point_positions|safe }};
+      var next_point_positions1 = {{ next_point_positions1|safe }};
+      var next_point_positions2 = {{ next_point_positions2|safe }};
+      var next_point_positions3 = {{ next_point_positions3|safe }};
+      var next_point_positions4 = {{ next_point_positions4|safe }};
+      var next_point_positions5 = {{ next_point_positions5|safe }};
+      {# TODO #}
 
-      if (localization_counter === 1) {
+{#      if (localization_counter === 1) {
           var next_point_positions1 = {{ next_point_positions1|safe }};
       }
 
@@ -154,9 +158,10 @@
           var next_point_positions1 = {{ next_point_positions2|safe }};
           var next_point_positions2 = {{ next_point_positions1|safe }};
         }
-      }
 
-      if (localization_counter === 3) {
+      }#}
+
+{#      if (localization_counter === 3) {
           var time_from_point1_to_point2 = {{ time_from_point1_to_point2|safe }};
           if (time_from_start_to_point1 < time_from_start_to_point2 && time_from_start_to_point1 < time_from_start_to_point3) {
               var next_point_positions1 = {{ next_point_positions1|safe }};
@@ -186,17 +191,9 @@
                   var next_point_positions3 = {{ next_point_positions1|safe }};
               }
           }
-      }
+      }#}
 
 
-
-
-
-
-
-      var next_point_positions4 = {{ next_point_positions4|safe }};
-      var next_point_positions5 = {{ next_point_positions5|safe }};
-      var next_point_positions6 = {{ next_point_positions6|safe }};
 
 
       var avoid_areas = {{ danger_list|safe }};
@@ -208,7 +205,7 @@
               // The start point of the route:
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions1,
+              'waypoint1': 'geo!' + end_point_positions,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
@@ -223,7 +220,7 @@
               'waypoint0': 'geo!' + start_point_positions,
               // The end point of the route:
               'waypoint1': 'geo!' + next_point_positions1,
-              'waypoint2': 'geo!' + next_point_positions2,
+              'waypoint2': 'geo!' + end_point_positions,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
@@ -239,7 +236,7 @@
               // The end point of the route:
               'waypoint1': 'geo!' + next_point_positions1,
               'waypoint2': 'geo!' + next_point_positions2,
-              'waypoint3': 'geo!' + next_point_positions3,
+              'waypoint3': 'geo!' + end_point_positions,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
@@ -256,7 +253,7 @@
               'waypoint1': 'geo!' + next_point_positions1,
               'waypoint2': 'geo!' + next_point_positions2,
               'waypoint3': 'geo!' + next_point_positions3,
-              'waypoint4': 'geo!' + next_point_positions4,
+              'waypoint4': 'geo!' + end_point_positions,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
@@ -274,7 +271,7 @@
               'waypoint2': 'geo!' + next_point_positions2,
               'waypoint3': 'geo!' + next_point_positions3,
               'waypoint4': 'geo!' + next_point_positions4,
-              'waypoint5': 'geo!' + next_point_positions5,
+              'waypoint5': 'geo!' + end_point_positions,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
@@ -293,7 +290,7 @@
               'waypoint3': 'geo!' + next_point_positions3,
               'waypoint4': 'geo!' + next_point_positions4,
               'waypoint5': 'geo!' + next_point_positions5,
-              'waypoint6': 'geo!' + next_point_positions6,
+              'waypoint6': 'geo!' + end_point_positions,
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',

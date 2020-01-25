@@ -63,12 +63,12 @@ class ItemForm(FlaskForm):
 
 class MapForm(FlaskForm):
     start_place = StringField('Start place', validators=[DataRequired(), Length(0, 64)])
-    next_place1 = StringField('Next place', validators=[DataRequired(), Length(0, 64)])
+    end_place = StringField('End place', validators=[DataRequired(), Length(0, 64)])
+    next_place1 = StringField('Next place1', validators=[Length(0, 64)])
     next_place2 = StringField('Next place2', validators=[Length(0, 64)])
     next_place3 = StringField('Next place3', validators=[Length(0, 64)])
     next_place4 = StringField('Next place4', validators=[Length(0, 64)])
     next_place5 = StringField('Next place5', validators=[Length(0, 64)])
-    next_place6 = StringField('End place', validators=[Length(0, 64)])
     start_time = DateTimeField('Start time',  format='%Y-%m-%d %H:%M')
     title = StringField('Title')
     submit = SubmitField('Show')

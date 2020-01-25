@@ -237,6 +237,17 @@ class Journey(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
+class Car(db.Model):
+    __tablename__ = "cars"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    capacity_length = db.Column(db.Float)
+    capacity_weight = db.Column(db.Float)
+    capacity_width = db.Column(db.Float)
+    capacity_height = db.Column(db.Float)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
 class Item(db.Model):
     __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
