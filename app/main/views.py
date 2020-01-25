@@ -194,8 +194,6 @@ def map():
                         end_dict_json['Latitude'], end_dict_json['Longitude'])
         time_from_start_to_end = route_between_start_and_end[0]
         distance_from_start_to_end = route_between_start_and_end[1]
-        response = route_between_start_and_end[2]
-        print(time_from_start_to_end, distance_from_start_to_end)
 
         next_place1 = form.next_place1.data or None
         next_point_positions1 = None
@@ -212,14 +210,11 @@ def map():
                                                  next_dict1_json['Latitude'], next_dict1_json['Longitude'])
             time_from_start_to_point1 = route_between_start_and_point1[0]
             distance_from_start_to_point1 = route_between_start_and_point1[1]
-            response2 = route_between_start_and_point1[2]
-            print(time_from_start_to_point1, distance_from_start_to_point1)
 
-            route_between_point1_and_end = calculate_route(end_dict_json['Latitude'], end_dict_json['Longitude'],
-                        next_dict1_json['Latitude'], next_dict1_json['Longitude'])
+            route_between_point1_and_end = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
+                        end_dict_json['Latitude'], end_dict_json['Longitude'])
             time_from_point1_to_end = route_between_point1_and_end[0]
             distance_from_point1_to_end = route_between_point1_and_end[1]
-            print(time_from_point1_to_end, distance_from_point1_to_end)
 
         next_place2 = form.next_place2.data or None
         next_point_positions2 = None
@@ -237,24 +232,44 @@ def map():
                                                   next_dict2_json['Latitude'], next_dict2_json['Longitude'])
             time_from_start_to_point2 = route_between_start_and_point2[0]
             distance_from_start_to_point2 = route_between_start_and_point2[1]
-            response3 = route_between_start_and_point2[2]
-            print(time_from_start_to_point2, distance_from_start_to_point2)
 
-            route_between_point2_and_end = calculate_route(end_dict_json['Latitude'], end_dict_json['Longitude'],
+            route_between_point1_and_point2 = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
                                                              next_dict2_json['Latitude'], next_dict2_json['Longitude'])
+            time_from_point1_to_point2 = route_between_point1_and_point2[0]
+            distance_from_point1_to_point2 = route_between_point1_and_point2[1]
+
+            route_between_point2_and_end = calculate_route(next_dict2_json['Latitude'], end_dict_json['Longitude'],
+                                                             end_dict_json['Latitude'], end_dict_json['Longitude'])
             time_from_point2_to_end = route_between_point2_and_end[0]
             distance_from_point2_to_end = route_between_point2_and_end[1]
-            response2 = route_between_point2_and_end[2]
-            print(time_from_point2_to_end, distance_from_point2_to_end)
 
         next_place3 = form.next_place3.data or None
         next_point_positions3 = None
+        time_from_start_to_point3 = None
+        time_from_point1_to_point3 = None
+        time_from_point2_to_point3 = None
+        time_from_point3_to_end = None
         if next_place3 is not None:
             next_point3 = geocoderApi.free_form(next_place3)
             next_dict3 = json.loads(next_point3.as_json_string())
             next_dict3_json = next_dict3['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
             next_point_positions3 = str(next_dict3_json['Latitude']) + ',' + str(next_dict3_json['Longitude'])
             temp_counter += 1
+
+            route_between_start_and_point3 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
+                                                             next_dict3_json['Latitude'], next_dict3_json['Longitude'])
+            time_from_start_to_point3 = route_between_start_and_point3[0]
+            distance_from_start_to_point3 = route_between_start_and_point3[1]
+
+            route_between_point1_and_point3 = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
+                                                           next_dict3_json['Latitude'], next_dict3_json['Longitude'])
+            time_from_point1_to_point3 = route_between_point1_and_point3[0]
+            distance_from_point1_to_point3 = route_between_point1_and_point3[1]
+
+            route_between_point2_and_point3 = calculate_route(next_dict2_json['Latitude'], next_dict2_json['Longitude'],
+                                                              next_dict3_json['Latitude'], next_dict3_json['Longitude'])
+            time_from_point2_to_point3 = route_between_point2_and_point3[0]
+            distance_from_point2_to_point3 = route_between_point2_and_point3[1]
 
         next_place4 = form.next_place4.data or None
         next_point_positions4 = None
@@ -282,22 +297,45 @@ def map():
         if temp_counter == 1:
             end_point_positions = end_point_positions
         elif temp_counter == 2:
+            end_point_positions = end_point_positions
             if time_from_start_to_end < time_from_start_to_point1:
-                end_point_positions = end_point_positions
                 next_point_positions1 = next_point_positions1
             elif time_from_start_to_end > time_from_start_to_point1:
-                end_point_positions = end_point_positions
                 next_point_positions1 = next_point_positions1
         elif temp_counter == 3:
+            end_point_positions = end_point_positions
             if time_from_start_to_point1 < time_from_start_to_point2:
-                end_point_positions = end_point_positions
                 next_point_positions1 = next_point_positions1
                 next_point_positions2 = next_point_positions2
             elif time_from_start_to_point1 > time_from_start_to_point2:
-                end_point_positions = end_point_positions
                 next_point_positions1 = next_point_positions2
                 next_point_positions2 = next_point_positions1
-                # TODO
+        elif temp_counter == 4:
+            end_point_positions = end_point_positions
+            if time_from_start_to_point1 < time_from_start_to_point2 and time_from_start_to_point1 < time_from_start_to_point3:
+                next_point_positions1 = next_point_positions1
+                if time_from_point1_to_point3 < time_from_point1_to_point2:
+                    next_point_positions2 = next_point_positions3
+                    next_point_positions3 = next_point_positions2
+                else:
+                    next_point_positions2 = next_point_positions2
+                    next_point_positions3 = next_point_positions3
+            if time_from_start_to_point2 < time_from_start_to_point1 and time_from_start_to_point2 < time_from_start_to_point3:
+                next_point_positions1 = next_point_positions2
+                if time_from_point1_to_point2 < time_from_point2_to_point3:
+                    next_point_positions2 = next_point_positions1
+                    next_point_positions3 = next_point_positions3
+                else:
+                    next_point_positions2 = next_point_positions3
+                    next_point_positions3 = next_point_positions1
+            if time_from_start_to_point3 < time_from_start_to_point1 and time_from_start_to_point3 < time_from_start_to_point2:
+                next_point_positions1 = next_point_positions3
+                if time_from_point1_to_point3 < time_from_point2_to_point3:
+                    next_point_positions2 = next_point_positions1
+                    next_point_positions3 = next_point_positions2
+                else:
+                    next_point_positions2 = next_point_positions2
+                    next_point_positions3 = next_point_positions1
 
         journey = Journey(start_localization=form.start_place.data, start_time=form.start_time.data,
                           destination=form.next_place1.data, author_id=current_user.id,
@@ -305,7 +343,8 @@ def map():
         db.session.add(journey)
         db.session.commit()
 
-        return render_template('map.html', form=form, start_point=start_dict_json, next_point=end_dict_json, response=response,
+        return render_template('map.html', form=form,
+                               start_point=start_dict_json, next_point=end_dict_json,
                                start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
                                #danger_list_center=json.dumps(danger_list_center),
@@ -313,8 +352,10 @@ def map():
                                time_from_start_to_end=json.dumps(time_from_start_to_end) or None,
                                time_from_start_to_point1=json.dumps(time_from_start_to_point1) or None,
                                time_from_start_to_point2=json.dumps(time_from_start_to_point2) or None,
+                               time_from_start_to_point3=json.dumps(time_from_start_to_point3) or None,
                                time_from_point1_to_end=json.dumps(time_from_point1_to_end) or None,
                                time_from_point2_to_end=json.dumps(time_from_point2_to_end) or None,
+                               time_from_point3_to_end=json.dumps(time_from_point3_to_end) or None,
                                time_from_point1_to_point2=json.dumps(time_from_point1_to_point2) or None,
                                next_point_positions1=json.dumps(next_point_positions1) or None,
                                next_point_positions2=json.dumps(next_point_positions2) or None,
