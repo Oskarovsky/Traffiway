@@ -3,6 +3,12 @@ import os
 import tempfile
 import googlemaps
 
+#import tkinter
+import numpy
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
+
 import herepy
 from datetime import datetime
 from sqlalchemy import text
@@ -236,6 +242,51 @@ def show_car(id):
     return render_template('car.html', car=car)
 
 
+def plot_cube(cube_definition, cargo_size, id):
+    cube_definition_array = [
+        numpy.array(list(item))
+        for item in cube_definition
+    ]
+
+    points = []
+    points += cube_definition_array
+    vectors = [
+        cube_definition_array[1] - cube_definition_array[0],
+        cube_definition_array[2] - cube_definition_array[0],
+        cube_definition_array[3] - cube_definition_array[0]
+    ]
+
+    points += [cube_definition_array[0] + vectors[0] + vectors[1]]
+    points += [cube_definition_array[0] + vectors[0] + vectors[2]]
+    points += [cube_definition_array[0] + vectors[1] + vectors[2]]
+    points += [cube_definition_array[0] + vectors[0] + vectors[1] + vectors[2]]
+
+    points = numpy.array(points)
+
+    edges = [
+        [points[0], points[3], points[5], points[1]],
+        [points[1], points[5], points[7], points[4]],
+        [points[4], points[2], points[6], points[7]],
+        [points[2], points[6], points[3], points[0]],
+        [points[0], points[2], points[4], points[1]],
+        [points[3], points[6], points[7], points[5]]
+    ]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    faces = Poly3DCollection(edges, linewidths=1, edgecolors='k')
+    faces.set_facecolor((0, 0, 1, 0.1))
+
+    ax.add_collection3d(faces)
+
+    # Plot the points themselves to force the scaling of the axes
+    ax.scatter(points[:, 0], points[:, 1], points[:, 2], s=0)
+    plt.savefig('app/static/cargo/' + str(id))
+
+    #ax.set_aspect('equal')
+
+
 @main.route('/route/<int:id>', methods=['GET', 'POST'])
 @login_required
 def show_route(id):
@@ -244,7 +295,12 @@ def show_route(id):
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
-    return render_template('route.html', journey=route, items=items, car=car,
+    cube_definition = [
+        (0, 0, 0), (0, 1, 0), (1, 0, 0), (0, 0, 1)
+    ]
+    plot_cube(cube_definition, cargo_size=1, id=id)
+
+    return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list))
 
 
