@@ -35,7 +35,8 @@ def index():
         post = Post(body=form.body.data, localization=form.localization.data,
                     author=current_user._get_current_object())
         position = geocoderApi.free_form(form.localization.data)
-        position_json = json.loads(position.as_json_string())['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+        position_json = json.loads(position.as_json_string())['Response']['View'][0]['Result'][0]['Location'][
+            'DisplayPosition']
 
         latitude_int = float(position_json['Latitude'])
         longitude_int = float(position_json['Longitude'])
@@ -119,8 +120,8 @@ def edit_profile_admin(id):
 
 def calculate_route(first_lat, first_lon, second_lat, second_lon):
     distance_request = routingApi.car_route([first_lat, first_lon],
-                                             [second_lat, second_lon],
-                                             [herepy.RouteMode.car, herepy.RouteMode.fastest])
+                                            [second_lat, second_lon],
+                                            [herepy.RouteMode.car, herepy.RouteMode.fastest])
     response_json = json.loads(distance_request.as_json_string())
     response = response_json['response']['route'][0]['summary']
     return response['travelTime'], response['distance'], response
@@ -154,29 +155,39 @@ def add_item(journey_id):
     if end_point is not None:
         points.append([0, end_point])
     point1 = Journey.query.filter_by(id=journey_id).first().next_localization1
-    if point1 is not None:
+    if point1 != 'null' and point1 is not None:
         points.append([1, point1])
     point2 = Journey.query.filter_by(id=journey_id).first().next_localization2
-    if point2 is not None:
+    if point2 != 'null' and point2 is not None:
         points.append([2, point2])
     point3 = Journey.query.filter_by(id=journey_id).first().next_localization3
-    if point3 is not None:
+    if point3 != 'null' and point3 is not None:
         points.append([3, point3])
     point4 = Journey.query.filter_by(id=journey_id).first().next_localization4
-    if point4 is not None:
+    if point4 != 'null' and point4 is not None:
         points.append([4, point4])
     point5 = Journey.query.filter_by(id=journey_id).first().next_localization5
-    if point5 is not None:
+    if point5 != 'null' and point5 is not None:
         points.append([5, point5])
     available_points = points
     points_list = [(j[0], j[1]) for j in available_points]
-    form.journey_id.choices = points_list
+    form.target.choices = points_list
     if form.validate_on_submit():
         item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
                     width=form.width.data, height=form.height.data, journey_id=journey_id,
+                    target=points_list[form.target.data][1],
                     author_id=current_user.id)
-        db.session.add(item)
-        db.session.commit()
+        journey = Journey.query.filter_by(id=journey_id).first()
+        journey.free_capacity_weight -= item.weight
+        journey.free_capacity_length -= item.length
+        journey.free_capacity_height -= item.height
+        journey.free_capacity_width -= item.width
+        if journey.free_capacity_weight < 0 or journey.free_capacity_length < 0 \
+                or journey.free_capacity_height < 0 or journey.free_capacity_width < 0:
+            flash('There are no free space enough for that item in the vehicle')
+        else:
+            db.session.add(item)
+            db.session.commit()
         return redirect(url_for('.show_route', id=journey_id))
     return render_template('add_item.html', form=form)
 
@@ -191,7 +202,7 @@ def add_car():
                   capacity_width=form.capacity_width.data, author_id=current_user.id)
         db.session.add(car)
         db.session.commit()
-        return redirect(url_for('.show_cars',))
+        return redirect(url_for('.show_cars', ))
     return render_template('add_car.html', form=form)
 
 
@@ -261,9 +272,15 @@ def map():
         temp_counter += 1
 
         route_between_start_and_end = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
-                        end_dict_json['Latitude'], end_dict_json['Longitude'])
+                                                      end_dict_json['Latitude'], end_dict_json['Longitude'])
         time_from_start_to_end = route_between_start_and_end[0]
         distance_from_start_to_end = route_between_start_and_end[1]
+
+        selected_car = Car.query.filter(Car.id == form.car_id.data).first()
+        free_capacity_length = selected_car.capacity_length
+        free_capacity_weight = selected_car.capacity_weight
+        free_capacity_width = selected_car.capacity_width
+        free_capacity_height = selected_car.capacity_height
 
         next_place1 = form.next_place1.data or None
         next_point_positions1 = None
@@ -277,12 +294,12 @@ def map():
             temp_counter += 1
 
             route_between_start_and_point1 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
-                                                 next_dict1_json['Latitude'], next_dict1_json['Longitude'])
+                                                             next_dict1_json['Latitude'], next_dict1_json['Longitude'])
             time_from_start_to_point1 = route_between_start_and_point1[0]
             distance_from_start_to_point1 = route_between_start_and_point1[1]
 
             route_between_point1_and_end = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
-                        end_dict_json['Latitude'], end_dict_json['Longitude'])
+                                                           end_dict_json['Latitude'], end_dict_json['Longitude'])
             time_from_point1_to_end = route_between_point1_and_end[0]
             distance_from_point1_to_end = route_between_point1_and_end[1]
 
@@ -299,17 +316,17 @@ def map():
             temp_counter += 1
 
             route_between_start_and_point2 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
-                                                  next_dict2_json['Latitude'], next_dict2_json['Longitude'])
+                                                             next_dict2_json['Latitude'], next_dict2_json['Longitude'])
             time_from_start_to_point2 = route_between_start_and_point2[0]
             distance_from_start_to_point2 = route_between_start_and_point2[1]
 
             route_between_point1_and_point2 = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
-                                                             next_dict2_json['Latitude'], next_dict2_json['Longitude'])
+                                                              next_dict2_json['Latitude'], next_dict2_json['Longitude'])
             time_from_point1_to_point2 = route_between_point1_and_point2[0]
             distance_from_point1_to_point2 = route_between_point1_and_point2[1]
 
             route_between_point2_and_end = calculate_route(next_dict2_json['Latitude'], end_dict_json['Longitude'],
-                                                             end_dict_json['Latitude'], end_dict_json['Longitude'])
+                                                           end_dict_json['Latitude'], end_dict_json['Longitude'])
             time_from_point2_to_end = route_between_point2_and_end[0]
             distance_from_point2_to_end = route_between_point2_and_end[1]
 
@@ -332,7 +349,7 @@ def map():
             distance_from_start_to_point3 = route_between_start_and_point3[1]
 
             route_between_point1_and_point3 = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
-                                                           next_dict3_json['Latitude'], next_dict3_json['Longitude'])
+                                                              next_dict3_json['Latitude'], next_dict3_json['Longitude'])
             time_from_point1_to_point3 = route_between_point1_and_point3[0]
             distance_from_point1_to_point3 = route_between_point1_and_point3[1]
 
@@ -358,7 +375,6 @@ def map():
             next_dict5_json = next_dict5['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
             next_point_positions5 = str(next_dict5_json['Latitude']) + ',' + str(next_dict5_json['Longitude'])
             temp_counter += 1
-
 
         all_dangers = [Danger.position for Danger in Danger.query.all()]
         danger_list = '!'.join(all_dangers)
@@ -407,11 +423,11 @@ def map():
                     next_point_positions3 = next_point_positions1
 
         journey = Journey(start_localization=form.start_place.data, end_localization=form.end_place.data,
-                          next_localization1=json.dumps(next_place1) or None,
-                          next_localization2=json.dumps(next_place2) or None,
-                          next_localization3=json.dumps(next_place3) or None,
-                          next_localization4=json.dumps(next_place4) or None,
-                          next_localization5=json.dumps(next_place5) or None,
+                          next_localization1=form.next_place1.data or None,
+                          next_localization2=form.next_place2.data or None,
+                          next_localization3=form.next_place3.data or None,
+                          next_localization4=form.next_place4.data or None,
+                          next_localization5=form.next_place5.data or None,
                           author_id=current_user.id, start_time=form.start_time.data,
                           title=form.title.data + ' [' + form.start_place.data + ' - ' + form.end_place.data + ']',
                           start_point_positions=json.dumps(start_point_positions),
@@ -421,14 +437,20 @@ def map():
                           next_point_positions3=json.dumps(next_point_positions3) or None,
                           next_point_positions4=json.dumps(next_point_positions4) or None,
                           next_point_positions5=json.dumps(next_point_positions5) or None,
+                          free_capacity_length=free_capacity_length,
+                          free_capacity_weight=free_capacity_weight,
+                          free_capacity_width=free_capacity_width,
+                          free_capacity_height=free_capacity_height,
                           localization_counter=temp_counter, car_id=form.car_id.data)
 
         db.session.add(journey)
         db.session.commit()
+        flash('This route has been added to the database')
 
         return render_template('map.html', form=form,
                                start_point=start_dict_json, next_point=end_dict_json,
-                               start_point_positions=json.dumps(start_point_positions), danger_list=json.dumps(danger_list),
+                               start_point_positions=json.dumps(start_point_positions),
+                               danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
                                end_point_positions=json.dumps(end_point_positions),
                                time_from_start_to_end=json.dumps(time_from_start_to_end) or None,
@@ -452,4 +474,3 @@ def handle_geocode():
     geocoderApi = herepy.GeocoderApi(current_app.config['HERE_API_KEY'])
     response = geocoderApi.free_form('200 S Mathilda Sunnyvale CA')
     return response.as_json_string()
-

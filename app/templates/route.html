@@ -43,8 +43,18 @@
                     </td>
                 </tr>
             {% endfor %}
+            <tr>
+                <td>REMAINING SPACE</td>
+                <td></td>
+                <td>{{ journey.free_capacity_weight }}</td>
+                <td>{{ journey.free_capacity_length }}</td>
+                <td>{{ journey.free_capacity_width }}</td>
+                <td>{{ journey.free_capacity_height }}</td>
+                <td></td>
+            </tr>
             </tbody>
         </table>
+
     <a class="btn btn-default" href="{{ url_for('main.add_item', journey_id=journey.id) }}">Add item</a>
     </div>
 

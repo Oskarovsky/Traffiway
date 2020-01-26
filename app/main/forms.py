@@ -57,7 +57,7 @@ class ItemForm(FlaskForm):
     length = FloatField('Length [m]')
     width = FloatField('Width [m]')
     height = FloatField('Height [m]')
-    journey_id = SelectField(u'Journey', coerce=int)
+    target = SelectField(u'Target', coerce=int)
     submit = SubmitField('Submit')
 
 
