@@ -249,6 +249,7 @@ class Journey(db.Model):
     next_point_positions5 = db.Column(db.String(64))
     localization_counter = db.Column(db.Integer)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    car_id = db.Column(db.Integer, db.ForeignKey('cars.id'))
 
 
 class Car(db.Model):

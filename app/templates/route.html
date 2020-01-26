@@ -11,6 +11,7 @@
         Start localization: {{ journey.start_localization }} <br>
         Start time: {{ journey.start_time }} <br>
         End localization: {{ journey.end_localization }} <br>
+        Vehicle: {{ car.name }} <a href="{{ url_for('main.show_car', id=car.id) }}">(Show details)</a>
 
         <h4>All items:</h4>
         <table class="table table-striped table-bordered" style="width: 100%">
@@ -22,7 +23,7 @@
                     <th>Length</th>
                     <th>Width</th>
                     <th>Height</th>
-                    <td>Target</td>
+                    <th>Target</th>
                 </tr>
             </thead>
             <tbody>

@@ -169,7 +169,6 @@ def add_item(journey_id):
     if point5 is not None:
         points.append([5, point5])
     available_points = points
-    print(points)
     points_list = [(j[0], j[1]) for j in available_points]
     form.journey_id.choices = points_list
     if form.validate_on_submit():
@@ -231,15 +230,21 @@ def show_car(id):
 def show_route(id):
     route = Journey.query.filter_by(id=id).first_or_404()
     items = Item.query.filter(Item.journey_id == id).all()
+    car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
-    return render_template('route.html', journey=route, items=items, danger_list=json.dumps(danger_list))
+    return render_template('route.html', journey=route, items=items, car=car,
+                           danger_list=json.dumps(danger_list))
 
 
 @main.route('/map', methods=['GET', 'POST'])
 def map():
     form = MapForm()
     temp_counter = 0
+
+    available_vehicles = Car.query.filter(Car.author_id == current_user.id)
+    vehicles_list = [(j.id, j.name) for j in available_vehicles]
+    form.car_id.choices = vehicles_list
 
     if form.validate_on_submit():
         start_place = form.start_place.data
@@ -357,7 +362,6 @@ def map():
 
         all_dangers = [Danger.position for Danger in Danger.query.all()]
         danger_list = '!'.join(all_dangers)
-        print(danger_list)
 
         if temp_counter == 1:
             end_point_positions = end_point_positions
@@ -417,7 +421,7 @@ def map():
                           next_point_positions3=json.dumps(next_point_positions3) or None,
                           next_point_positions4=json.dumps(next_point_positions4) or None,
                           next_point_positions5=json.dumps(next_point_positions5) or None,
-                          localization_counter=temp_counter)
+                          localization_counter=temp_counter, car_id=form.car_id.data)
 
         db.session.add(journey)
         db.session.commit()

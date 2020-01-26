@@ -6,8 +6,10 @@
 {% block page_content %}
 
     <div>
-        {% if current_user %}
-            {{ wtf.quick_form(form) }}
+        {% if current_user.is_authenticated %}
+            {% if current_user %}
+                {{ wtf.quick_form(form) }}
+            {% endif %}
         {% endif %}
     </div>
 

@@ -70,6 +70,7 @@ class MapForm(FlaskForm):
     next_place4 = StringField('Next place4', validators=[Length(0, 64)])
     next_place5 = StringField('Next place5', validators=[Length(0, 64)])
     start_time = DateTimeField('Start time',  format='%Y-%m-%d %H:%M')
+    car_id = SelectField(u'Vehicle', coerce=int)
     title = StringField('Title')
     submit = SubmitField('Show')
 
