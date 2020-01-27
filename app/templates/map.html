@@ -71,34 +71,6 @@
         zoom.setAlignment('top-left');
 
 
-
-
-
-
-        //MARKERS
-        {#// Define a variable holding SVG mark-up that defines an icon image:#}
-        {#var svgMarkup = '<svg width="24" height="24" ' +#}
-        {#    'xmlns="http://www.w3.org/2000/svg">' +#}
-        {#    '<rect stroke="white" fill="#1b468d" x="1" y="1" width="22" ' +#}
-        {#    'height="22" /><text x="12" y="18" font-size="12pt" ' +#}
-        {#    'font-family="Arial" font-weight="bold" text-anchor="middle" ' +#}
-        {#    'fill="white">H</text></svg>';#}
-
-
-        {#var avoid_centres = {{ danger_list_center|safe }};#}
-        {#var array_centres = avoid_centres.split('|'),#}
-        {#  warn1 = array_centres[0], warn2 = array_centres[1], warn3 = array_centres[3];#}
-        {##}
-        {#var warn1_geo = warn1.split(','), warn1_lat=warn1_geo[0], warn1_lng=warn1[1]#}
-
-        {#// Create an icon, an object holding the latitude and longitude, and a marker:#}
-        {#var icon = new H.map.Icon(svgMarkup),#}
-        {#    coords = {lat: warn1_lat, lng: warn1_lng},#}
-        {#    marker = new H.map.Marker(coords, {icon: icon});#}
-        {##}
-        {#// Add the marker to the map and center the map at the location of the marker:#}
-        {#map.addObject(marker);#}
-
           var geocodingParams = {
           searchText: 'Warszawa, Polaka 3'
         };
@@ -120,12 +92,6 @@
 
         // Get an instance of the geocoding service:
         var geocoder = platform.getGeocodingService();
-
-        // Call the geocode method with the geocoding parameters,
-        // the callback and an error callback function (called if a
-        // communication error occurs):
-        //geocoder.geocode(geocodingParams, onResult, function(e) {
-         // alert(e);
 
 
 });
@@ -537,7 +503,5 @@
 
     </script>
 
-
-    <script type="text/javascript" src='js/map.js'></script>
 
 {% endblock %}

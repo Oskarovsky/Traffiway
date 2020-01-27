@@ -1,3 +1,5 @@
+import base64
+import io
 import json
 import os
 import tempfile
@@ -15,7 +17,7 @@ from sqlalchemy import text
 
 import requests
 
-from flask import render_template, session, redirect, url_for, current_app, flash, request, jsonify
+from flask import render_template, session, redirect, url_for, current_app, flash, request, jsonify, make_response
 from flask_login import login_required, current_user
 from wtforms import ValidationError
 from werkzeug.utils import secure_filename
@@ -247,6 +249,7 @@ def plot_cube(cube_definition, cargo_size, id):
         numpy.array(list(item))
         for item in cube_definition
     ]
+    img = io.BytesIO()
 
     points = []
     points += cube_definition_array
@@ -284,7 +287,17 @@ def plot_cube(cube_definition, cargo_size, id):
     ax.scatter(points[:, 0], points[:, 1], points[:, 2], s=0)
     plt.savefig('app/static/cargo/' + str(id))
 
-    #ax.set_aspect('equal')
+    # plt.savefig(img, format='png')
+    # img.seek(0)
+    # plot_url = base64.b64encode(img.getvalue()).decode()
+    # return '<img src="data:image/png;base64,{}">'.format(plot_url)
+
+
+@main.route('/3d/<int:id>', methods=['GET', 'POST'])
+def cargo(id):
+    route = Journey.query.filter_by(id=id).first_or_404()
+    car = Car.query.filter(Car.id == route.car_id).first_or_404()
+    return render_template('cargo.html', route=route, car=car)
 
 
 @main.route('/route/<int:id>', methods=['GET', 'POST'])
@@ -295,10 +308,11 @@ def show_route(id):
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
-    cube_definition = [
-        (0, 0, 0), (0, 1, 0), (1, 0, 0), (0, 0, 1)
-    ]
-    plot_cube(cube_definition, cargo_size=1, id=id)
+    #
+    # cube_definition = [
+    #     (0, 0, 0), (0, 1, 0), (1, 0, 0), (0, 0, 1)
+    # ]
+    # plot_cube(cube_definition, cargo_size=1, id=id)
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list))

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Traffiway - Your cargo{% endblock %}
+
+
+{% block page_content %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/102/three.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
+    <script src="https://unpkg.com/three@0.85.0/examples/js/controls/OrbitControls.js"></script>
+
+    <div class="container mb-3 mt-3">
+        <div class="page-header">
+            <h2>Payload: </h2>
+            <div id="cargoContainer" style="border:1px solid #000000;"></div>
+        </div>
+    </div>
+
+    <div>ssssssssssssssss</div>
+
+
+
+
+
+    <script>
+        var targetCanvas = document.getElementById("cargoContainer");
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera( 75, 640 / 480, 0.1, 1000 );
+
+        var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+        renderer.setClearColor( 0xffffff, 0 );
+        renderer.setSize( 640, 480 );
+        targetCanvas.appendChild( renderer.domElement );
+
+        var controls = new THREE.OrbitControls(camera, renderer.domElement );
+
+        var cargo_box = new THREE.BoxGeometry({{ car.capacity_width }}, {{ car.capacity_height }}, {{ car.capacity_length }});
+        var cargoMaterials =
+        [
+            new THREE.MeshBasicMaterial( { color: 0x00cc00, wireframe: true, side: THREE.DoubleSide }),  // RIGHT SIDE
+            new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true, side: THREE.DoubleSide }), // LEFT SIDE
+            new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true, side: THREE.DoubleSide }), // TOP SIDE
+            new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide }), // BOTTOM SIDE
+            new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }), // FRONT SIDE
+            new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide }), // BACK SIDE
+        ];
+
+        var material = new THREE.MeshFaceMaterial(cargoMaterials);
+        var cargo_cube = new THREE.Mesh( cargo_box, material );
+
+        scene.add( cargo_cube );
+        cargo_cube.rotation.x = 5;
+        cargo_cube.rotation.y = 5;
+        cargo_cube.rotation.z = 5;
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame( animate );
+            controls.update();
+            renderer.render( scene, camera );
+        }
+        animate()
+
+    </script>
+
+{% endblock %}
