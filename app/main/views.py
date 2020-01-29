@@ -305,9 +305,12 @@ def cargo(id):
 def show_route(id):
     route = Journey.query.filter_by(id=id).first_or_404()
     items = Item.query.filter(Item.journey_id == id).all()
+    items_number = Item.query.filter(Item.journey_id == id).count()
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
+    if items_number == 1:
+        item1 = [items[0].width, items[0].height, items[0].length, items[0].weight]
     #
     # cube_definition = [
     #     (0, 0, 0), (0, 1, 0), (1, 0, 0), (0, 0, 1)
@@ -315,7 +318,8 @@ def show_route(id):
     # plot_cube(cube_definition, cargo_size=1, id=id)
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
-                           danger_list=json.dumps(danger_list))
+                           danger_list=json.dumps(danger_list),
+                           item1=item1)
 
 
 @main.route('/map', methods=['GET', 'POST'])
