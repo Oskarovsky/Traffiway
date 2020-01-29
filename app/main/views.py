@@ -310,7 +310,10 @@ def show_route(id):
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
     if items_number == 1:
-        item1 = [items[0].width, items[0].height, items[0].length, items[0].weight]
+        item1_position_x = 0
+        item1_position_y = 0
+        item1_position_z = 0
+        item1 = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
     #
     # cube_definition = [
     #     (0, 0, 0), (0, 1, 0), (1, 0, 0), (0, 0, 1)

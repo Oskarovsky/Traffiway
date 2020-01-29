@@ -104,14 +104,13 @@
         scene.add( cargo_cube );
 
         scene.add( item1 );
-        item1_width = parseFloat({{ item1[0] }});
-        item1_height = parseFloat({{ item1[1] }});
-        item1_length = parseFloat({{ item1[2] }});
-        item1_weight = parseFloat({{ item1[3] }});
-        console.log(item1_length)
-        item1.position.x = 0;
-        item1.position.y = -{{ car.capacity_height }} / 4;
-        item1.position.z = ({{car.capacity_length}})
+        item1_position_x = parseFloat({{ item1[0] }});      // width
+        item1_position_y = parseFloat({{ item1[1] }});      // height
+        item1_position_z = parseFloat({{ item1[2] }});      // length
+        item1_weight = parseFloat({{ item1[3] }});          // weight
+        item1.position.x = item1_position_x;
+        item1.position.y = item1_position_y;
+        item1.position.z = item1_position_z;
 
         cargo_cube.rotation.x = 0;
         cargo_cube.rotation.y = 0;
