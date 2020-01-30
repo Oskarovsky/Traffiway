@@ -94,7 +94,7 @@
         ];
 
 
-        var geometry1 = new THREE.BoxGeometry({{ 2, 2, 2 }});
+        var geometry1 = new THREE.BoxGeometry({{ item1_dimension[0], item1_dimension[1], item1_dimension[2] }});
         var material1 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
         var item1 = new THREE.Mesh(geometry1, material1);
 
@@ -104,10 +104,10 @@
         scene.add( cargo_cube );
 
         scene.add( item1 );
-        item1_position_x = parseFloat({{ item1[0] }});      // width
-        item1_position_y = parseFloat({{ item1[1] }});      // height
-        item1_position_z = parseFloat({{ item1[2] }});      // length
-        item1_weight = parseFloat({{ item1[3] }});          // weight
+        item1_position_x = parseFloat({{ item1_position[0] }});      // width
+        item1_position_y = parseFloat({{ item1_position[1] }});      // height
+        item1_position_z = parseFloat({{ item1_position[2] }});      // length
+        item1_weight = parseFloat({{ item1_position[3] }});          // weight
         item1.position.x = item1_position_x;
         item1.position.y = item1_position_y;
         item1.position.z = item1_position_z;

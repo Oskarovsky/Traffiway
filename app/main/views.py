@@ -309,11 +309,15 @@ def show_route(id):
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
-    if items_number == 1:
-        item1_position_x = 0
-        item1_position_y = 0
-        item1_position_z = 0
-        item1 = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
+    if items_number >= 1:
+        item1_position_x = 0 - car.capacity_width/2 + items[0].width/2
+        item1_position_y = 0 - car.capacity_height/2 + items[0].height/2
+        item1_position_z = 0 - car.capacity_length/2 + items[0].length/2
+        item1_position = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
+        item1_dimension_x = items[0].width
+        item1_dimension_y = items[0].height
+        item1_dimension_z = items[0].length
+        item1_dimension = [item1_dimension_x,item1_dimension_y, item1_dimension_z]
     #
     # cube_definition = [
     #     (0, 0, 0), (0, 1, 0), (1, 0, 0), (0, 0, 1)
@@ -322,7 +326,7 @@ def show_route(id):
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list),
-                           item1=item1)
+                           item1_position=item1_position, item1_dimension=item1_dimension)
 
 
 @main.route('/map', methods=['GET', 'POST'])
