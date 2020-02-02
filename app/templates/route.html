@@ -93,17 +93,14 @@
             new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide }), // BACK SIDE
         ];
 
-
-        var geometry1 = new THREE.BoxGeometry({{ item1_dimension[0], item1_dimension[1], item1_dimension[2] }});
-        var material1 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
+        {% if items_number >= 1 %}
+        var item1_dimension_x = parseFloat({{ item1_dimension[0] }});
+        var item1_dimension_y = parseFloat({{ item1_dimension[1] }});
+        var item1_dimension_z = parseFloat({{ item1_dimension[2] }});
+        var geometry1 = new THREE.BoxGeometry( item1_dimension_x, item1_dimension_y, item1_dimension_z );
+        var material1 = new THREE.MeshBasicMaterial({color: 0x4FDCCC, wireframe: true});
         var item1 = new THREE.Mesh(geometry1, material1);
 
-        var material = new THREE.MeshFaceMaterial(cargoMaterials);
-        var cargo_cube = new THREE.Mesh( cargo_box, material );
-
-        scene.add( cargo_cube );
-
-        scene.add( item1 );
         item1_position_x = parseFloat({{ item1_position[0] }});      // width
         item1_position_y = parseFloat({{ item1_position[1] }});      // height
         item1_position_z = parseFloat({{ item1_position[2] }});      // length
@@ -111,7 +108,50 @@
         item1.position.x = item1_position_x;
         item1.position.y = item1_position_y;
         item1.position.z = item1_position_z;
+        scene.add( item1 );
+        {% endif %}
 
+        {% if items_number >= 2 %}
+        var item2_dimension_x = parseFloat({{ item2_dimension[0] }});
+        var item2_dimension_y = parseFloat({{ item2_dimension[1] }});
+        var item2_dimension_z = parseFloat({{ item2_dimension[2] }});
+        var geometry2 = new THREE.BoxGeometry( item2_dimension_x, item2_dimension_y, item2_dimension_z );
+        var material2 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
+        var item2 = new THREE.Mesh(geometry2, material2);
+
+        item2_position_x = parseFloat({{ item2_position[0] }});      // width
+        item2_position_y = parseFloat({{ item2_position[1] }});      // height
+        item2_position_z = parseFloat({{ item2_position[2] }});      // length
+        item2_weight = parseFloat({{ item2_position[3] }});          // weight
+        item2.position.x = item2_position_x;
+        item2.position.y = item2_position_y;
+        item2.position.z = item2_position_z;
+        scene.add( item2 );
+        {% endif %}
+
+        {% if items_number >= 3 %}
+        var item3_dimension_x = parseFloat({{ item3_dimension[0] }});
+        var item3_dimension_y = parseFloat({{ item3_dimension[1] }});
+        var item3_dimension_z = parseFloat({{ item3_dimension[2] }});
+        var geometry3 = new THREE.BoxGeometry( item3_dimension_x, item3_dimension_y, item3_dimension_z );
+        var material3 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
+        var item3 = new THREE.Mesh(geometry3, material3);
+
+        item3_position_x = parseFloat({{ item3_position[0] }});      // width
+        item3_position_y = parseFloat({{ item3_position[1] }});      // height
+        item3_position_z = parseFloat({{ item3_position[2] }});      // length
+        item3_weight = parseFloat({{ item2_position[3] }});          // weight
+        item3.position.x = item3_position_x;
+        item3.position.y = item3_position_y;
+        item3.position.z = item3_position_z;
+        scene.add( item3 );
+        {% endif %}
+
+
+
+        var material = new THREE.MeshFaceMaterial(cargoMaterials);
+        var cargo_cube = new THREE.Mesh( cargo_box, material );
+        scene.add( cargo_cube );
         cargo_cube.rotation.x = 0;
         cargo_cube.rotation.y = 0;
         cargo_cube.rotation.z = 0;

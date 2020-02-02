@@ -309,24 +309,53 @@ def show_route(id):
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
+    used_space_x = 0
+    used_space_y = 0
+    used_space_z = 0
+    item1_dimension = None
+    item1_position = None
     if items_number >= 1:
-        item1_position_x = 0 - car.capacity_width/2 + items[0].width/2
-        item1_position_y = 0 - car.capacity_height/2 + items[0].height/2
-        item1_position_z = 0 - car.capacity_length/2 + items[0].length/2
-        item1_position = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
         item1_dimension_x = items[0].width
         item1_dimension_y = items[0].height
         item1_dimension_z = items[0].length
-        item1_dimension = [item1_dimension_x,item1_dimension_y, item1_dimension_z]
-    #
-    # cube_definition = [
-    #     (0, 0, 0), (0, 1, 0), (1, 0, 0), (0, 0, 1)
-    # ]
-    # plot_cube(cube_definition, cargo_size=1, id=id)
+        item1_dimension = [item1_dimension_x, item1_dimension_y, item1_dimension_z]
+        item1_position_x = 0 - car.capacity_width/2 + item1_dimension_x/2
+        item1_position_y = 0 - car.capacity_height/2 + item1_dimension_y/2
+        item1_position_z = 0 - car.capacity_length/2 + item1_dimension_z/2
+        item1_position = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
+        used_space_x += item1_dimension_x
+        used_space_y += item1_dimension_y
+        used_space_z += item1_dimension_z
+    item2_dimension = None
+    item2_position = None
+    if items_number >= 2:
+        item2_dimension_x = items[1].width
+        item2_dimension_y = items[1].height
+        item2_dimension_z = items[1].length
+        item2_dimension = [item2_dimension_x, item2_dimension_y, item2_dimension_z]
+        item2_position_x = 0 - car.capacity_width/2 + item2_dimension_x/2 + used_space_x
+        item2_position_y = 0 - car.capacity_height/2 + item2_dimension_y/2
+        item2_position_z = 0 - car.capacity_length/2 + item2_dimension_z/2
+        item2_position = [item2_position_x, item2_position_y, item2_position_z, items[1].weight]
+        used_space_x += item2_dimension_x
+    item3_dimension = None
+    item3_position = None
+    if items_number >= 3:
+        item3_dimension_x = items[2].width
+        item3_dimension_y = items[2].height
+        item3_dimension_z = items[2].length
+        item3_dimension = [item3_dimension_x, item3_dimension_y, item3_dimension_z]
+        item3_position_x = 0 - car.capacity_width/2 + item3_dimension_x/2 + used_space_x
+        item3_position_y = 0 - car.capacity_height/2 + item3_dimension_y/2
+        item3_position_z = 0 - car.capacity_length/2 + item3_dimension_z/2
+        item3_position = [item3_position_x, item3_position_y, item3_position_z, items[2].weight]
+        used_space_x += item2_dimension_x
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
-                           danger_list=json.dumps(danger_list),
-                           item1_position=item1_position, item1_dimension=item1_dimension)
+                           danger_list=json.dumps(danger_list), items_number=items_number,
+                           item1_position=item1_position, item1_dimension=item1_dimension,
+                           item2_position=item2_position, item2_dimension=item2_dimension,
+                           item3_position=item3_position, item3_dimension=item3_dimension)
 
 
 @main.route('/map', methods=['GET', 'POST'])
