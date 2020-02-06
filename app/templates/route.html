@@ -33,8 +33,8 @@
                     <td>{{ item.name }}</td>
                     <td>{{ item.weight }}</td>
                     <td>{{ item.length }}</td>
-                    <td>{{ item.height }}</td>
                     <td>{{ item.width }}</td>
+                    <td>{{ item.height }}</td>
                     <td>
                         {% if not item.target == None  %}
                             <a href="http://maps.google.com/?q={{ item.target }}">{{ item.target }}</a>
@@ -140,11 +140,29 @@
         item3_position_x = parseFloat({{ item3_position[0] }});      // width
         item3_position_y = parseFloat({{ item3_position[1] }});      // height
         item3_position_z = parseFloat({{ item3_position[2] }});      // length
-        item3_weight = parseFloat({{ item2_position[3] }});          // weight
+        item3_weight = parseFloat({{ item3_position[3] }});          // weight
         item3.position.x = item3_position_x;
         item3.position.y = item3_position_y;
         item3.position.z = item3_position_z;
         scene.add( item3 );
+        {% endif %}
+
+        {% if items_number >= 4 %}
+        var item4_dimension_x = parseFloat({{ item4_dimension[0] }});
+        var item4_dimension_y = parseFloat({{ item4_dimension[1] }});
+        var item4_dimension_z = parseFloat({{ item4_dimension[2] }});
+        var geometry4 = new THREE.BoxGeometry( item4_dimension_x, item4_dimension_y, item4_dimension_z );
+        var material4 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
+        var item4 = new THREE.Mesh(geometry4, material4);
+
+        item4_position_x = parseFloat({{ item4_position[0] }});      // width
+        item4_position_y = parseFloat({{ item4_position[1] }});      // height
+        item4_position_z = parseFloat({{ item4_position[2] }});      // length
+        item4_weight = parseFloat({{ item4_position[3] }});          // weight
+        item4.position.x = item4_position_x;
+        item4.position.y = item4_position_y;
+        item4.position.z = item4_position_z;
+        scene.add( item4 );
         {% endif %}
 
 

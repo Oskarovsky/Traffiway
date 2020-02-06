@@ -244,60 +244,34 @@ def show_car(id):
     return render_template('car.html', car=car)
 
 
-def plot_cube(cube_definition, cargo_size, id):
-    cube_definition_array = [
-        numpy.array(list(item))
-        for item in cube_definition
-    ]
-    img = io.BytesIO()
-
-    points = []
-    points += cube_definition_array
-    vectors = [
-        cube_definition_array[1] - cube_definition_array[0],
-        cube_definition_array[2] - cube_definition_array[0],
-        cube_definition_array[3] - cube_definition_array[0]
-    ]
-
-    points += [cube_definition_array[0] + vectors[0] + vectors[1]]
-    points += [cube_definition_array[0] + vectors[0] + vectors[2]]
-    points += [cube_definition_array[0] + vectors[1] + vectors[2]]
-    points += [cube_definition_array[0] + vectors[0] + vectors[1] + vectors[2]]
-
-    points = numpy.array(points)
-
-    edges = [
-        [points[0], points[3], points[5], points[1]],
-        [points[1], points[5], points[7], points[4]],
-        [points[4], points[2], points[6], points[7]],
-        [points[2], points[6], points[3], points[0]],
-        [points[0], points[2], points[4], points[1]],
-        [points[3], points[6], points[7], points[5]]
-    ]
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    faces = Poly3DCollection(edges, linewidths=1, edgecolors='k')
-    faces.set_facecolor((0, 0, 1, 0.1))
-
-    ax.add_collection3d(faces)
-
-    # Plot the points themselves to force the scaling of the axes
-    ax.scatter(points[:, 0], points[:, 1], points[:, 2], s=0)
-    plt.savefig('app/static/cargo/' + str(id))
-
-    # plt.savefig(img, format='png')
-    # img.seek(0)
-    # plot_url = base64.b64encode(img.getvalue()).decode()
-    # return '<img src="data:image/png;base64,{}">'.format(plot_url)
-
-
 @main.route('/3d/<int:id>', methods=['GET', 'POST'])
 def cargo(id):
     route = Journey.query.filter_by(id=id).first_or_404()
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     return render_template('cargo.html', route=route, car=car)
+
+
+def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z):
+    if item_x < space_x and item_y < space_y and item_z < space_z:
+        space_x = space_x
+        space_y = space_y
+        space_z = space_z
+        return item_x, item_y, item_z, space_x, space_y, space_z
+    elif item_x < space_x and item_y < space_y and item_z > space_z:
+        if item_z < space_y and item_y < space_z:
+            temp = item_y
+            item_y = item_z
+            item_z = temp
+            return item_x, item_y, item_z, space_x, space_y, space_z
+        elif item_z < space_x and item_x < space_z:
+            temp = item_x
+            item_x = item_z
+            item_z = temp
+            return item_x, item_y, item_z, space_x, space_y, space_z
+        else:
+            flash('The are no enough available space')
+    return item_x, item_y, item_z, space_x, space_y, space_z
+
 
 
 @main.route('/route/<int:id>', methods=['GET', 'POST'])
@@ -312,13 +286,19 @@ def show_route(id):
     used_space_x = 0
     used_space_y = 0
     used_space_z = 0
+    free_space_x = route.free_capacity_width
+    free_space_y = route.free_capacity_height
+    free_space_z = route.free_capacity_length
+    free_weight = route.free_capacity_weight
     item1_dimension = None
     item1_position = None
     if items_number >= 1:
         item1_dimension_x = items[0].width
         item1_dimension_y = items[0].height
         item1_dimension_z = items[0].length
-        item1_dimension = [item1_dimension_x, item1_dimension_y, item1_dimension_z]
+        result = placement_algorithm(item1_dimension_x, item1_dimension_y, item1_dimension_z,
+                                     free_space_x, free_space_y, free_space_z)
+        item1_dimension = [result[0], result[1], result[2]]
         item1_position_x = 0 - car.capacity_width/2 + item1_dimension_x/2
         item1_position_y = 0 - car.capacity_height/2 + item1_dimension_y/2
         item1_position_z = 0 - car.capacity_length/2 + item1_dimension_z/2
@@ -326,36 +306,76 @@ def show_route(id):
         used_space_x += item1_dimension_x
         used_space_y += item1_dimension_y
         used_space_z += item1_dimension_z
+        free_space_x = free_space_x - used_space_x
+        free_space_y = free_space_y - used_space_y
+        free_space_z = free_space_z - used_space_z
+
     item2_dimension = None
     item2_position = None
     if items_number >= 2:
         item2_dimension_x = items[1].width
         item2_dimension_y = items[1].height
         item2_dimension_z = items[1].length
-        item2_dimension = [item2_dimension_x, item2_dimension_y, item2_dimension_z]
+        result = placement_algorithm(item2_dimension_x, item2_dimension_y, item2_dimension_z,
+                                     free_space_x, free_space_y, free_space_z)
+        item2_dimension = [result[0], result[1], result[2]]
         item2_position_x = 0 - car.capacity_width/2 + item2_dimension_x/2 + used_space_x
         item2_position_y = 0 - car.capacity_height/2 + item2_dimension_y/2
         item2_position_z = 0 - car.capacity_length/2 + item2_dimension_z/2
         item2_position = [item2_position_x, item2_position_y, item2_position_z, items[1].weight]
         used_space_x += item2_dimension_x
+        used_space_y += item2_dimension_y
+        used_space_z += item2_dimension_z
+        free_space_x = free_space_x - used_space_x
+        free_space_y = free_space_y - used_space_y
+        free_space_z = free_space_z - used_space_z
+
     item3_dimension = None
     item3_position = None
     if items_number >= 3:
         item3_dimension_x = items[2].width
         item3_dimension_y = items[2].height
         item3_dimension_z = items[2].length
-        item3_dimension = [item3_dimension_x, item3_dimension_y, item3_dimension_z]
+        result = placement_algorithm(item3_dimension_x, item3_dimension_y, item3_dimension_z,
+                                     free_space_x, free_space_y, free_space_z)
+        item3_dimension = [result[0], result[1], result[2]]
         item3_position_x = 0 - car.capacity_width/2 + item3_dimension_x/2 + used_space_x
         item3_position_y = 0 - car.capacity_height/2 + item3_dimension_y/2
         item3_position_z = 0 - car.capacity_length/2 + item3_dimension_z/2
         item3_position = [item3_position_x, item3_position_y, item3_position_z, items[2].weight]
-        used_space_x += item2_dimension_x
+        used_space_x += item3_dimension_x
+        # used_space_y += item3_dimension_y
+        # used_space_z += item3_dimension_z
+        free_space_x = free_space_x - used_space_x
+        free_space_y = free_space_y - used_space_y
+        free_space_z = free_space_z - used_space_z
+
+    item4_dimension = None
+    item4_position = None
+    if items_number >= 4:
+        item4_dimension_x = items[3].width
+        item4_dimension_y = items[3].height
+        item4_dimension_z = items[3].length
+        result = placement_algorithm(item4_dimension_x, item4_dimension_y, item4_dimension_z,
+                                     free_space_x, free_space_y, free_space_z)
+        item4_dimension = [result[0], result[1], result[2]]
+        item4_position_x = 0 - car.capacity_width/2 + item4_dimension_x/2 + used_space_x
+        item4_position_y = 0 - car.capacity_height/2 + item4_dimension_y/2
+        item4_position_z = 0 - car.capacity_length/2 + item4_dimension_z/2
+        item4_position = [item4_position_x, item4_position_y, item4_position_z, items[2].weight]
+        used_space_x += item4_dimension_x
+        # used_space_y += item4_dimension_y
+        # used_space_z += item4_dimension_z
+        free_space_x = free_space_x - used_space_x
+        free_space_y = free_space_y - used_space_y
+        free_space_z = free_space_z - used_space_z
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list), items_number=items_number,
                            item1_position=item1_position, item1_dimension=item1_dimension,
                            item2_position=item2_position, item2_dimension=item2_dimension,
-                           item3_position=item3_position, item3_dimension=item3_dimension)
+                           item3_position=item3_position, item3_dimension=item3_dimension,
+                           item4_position=item4_position, item4_dimension=item4_dimension)
 
 
 @main.route('/map', methods=['GET', 'POST'])
