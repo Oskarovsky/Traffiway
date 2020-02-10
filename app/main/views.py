@@ -184,33 +184,38 @@ def add_item(journey_id):
     available_points = points
     points_list = [(j[0], j[1]) for j in available_points]
     form.target.choices = points_list
+    journey = Journey.query.filter_by(id=journey_id).first()
     if form.validate_on_submit():
-        item1_position = None
-        if items_number >= 0:
-
-            journey = Journey.query.filter_by(id=journey_id).first()
-
-            result = placement_algorithm(form.width.data, form.height.data, form.length.data,
-                                journey.free_capacity_width, journey.free_capacity_height, journey.free_capacity_length)
+        result = placement_algorithm(form.width.data, form.height.data, form.length.data,
+                                     journey.free_capacity_width, journey.free_capacity_height,
+                                     journey.free_capacity_length)
+        if items_number == 0:
             item1_position_x = 0 - car.capacity_width / 2 + form.width.data / 2
             item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
             item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
-            journey.free_capacity_weight -= form.weight.data
-            journey.free_capacity_width -= result[0]
-            journey.free_capacity_height -= result[1]
-            journey.free_capacity_length -= result[2]
-            item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
-                        width=form.width.data, height=form.height.data, journey_id=journey_id,
-                        position_x=item1_position_x, position_y=item1_position_y, position_z=item1_position_z,
-                        target=points_list[form.target.data][1],
-                        author_id=current_user.id)
+        if items_number == 0:
+            item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
+            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
+            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
 
-            if not result[6]:
-                flash('There are no free space enough for that item in the vehicle')
-            else:
-                db.session.add(item)
-                db.session.commit()
-            return redirect(url_for('.show_route', id=journey_id))
+
+        journey.free_capacity_weight -= form.weight.data
+        journey.free_capacity_width -= result[0]
+        journey.free_capacity_height -= result[1]
+        journey.free_capacity_length -= result[2]
+        item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
+                    width=form.width.data, height=form.height.data, journey_id=journey_id,
+                    position_x=item1_position_x, position_y=item1_position_y, position_z=item1_position_z,
+                    target=points_list[form.target.data][1],
+                    author_id=current_user.id)
+
+        if not result[6]:
+            flash('There are no free space enough for that item in the vehicle')
+        else:
+            db.session.add(item)
+            db.session.commit()
+        return redirect(url_for('.show_route', id=journey_id))
+
     return render_template('add_item.html', form=form)
 
 
