@@ -279,6 +279,9 @@ class Item(db.Model):
     height = db.Column(db.Float)
     target = db.Column(db.String(64))
     image = db.Column(db.String(64))
+    position_x = db.Column(db.Float)
+    position_y = db.Column(db.Float)
+    position_z = db.Column(db.Float)
     journey_id = db.Column(db.Integer, db.ForeignKey('journeys.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 

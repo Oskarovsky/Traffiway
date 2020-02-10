@@ -160,6 +160,9 @@ def upload_file():
 def add_item(journey_id):
     form = ItemForm()
     points = []
+    route = Journey.query.filter_by(id=journey_id).first_or_404()
+    items_number = Item.query.filter(Item.journey_id == journey_id).count()
+    car = Car.query.filter(Car.id == route.car_id).first_or_404()
     end_point = Journey.query.filter_by(id=journey_id).first().end_localization
     if end_point is not None:
         points.append([0, end_point])
@@ -182,22 +185,32 @@ def add_item(journey_id):
     points_list = [(j[0], j[1]) for j in available_points]
     form.target.choices = points_list
     if form.validate_on_submit():
-        item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
-                    width=form.width.data, height=form.height.data, journey_id=journey_id,
-                    target=points_list[form.target.data][1],
-                    author_id=current_user.id)
-        journey = Journey.query.filter_by(id=journey_id).first()
-        journey.free_capacity_weight -= item.weight
-        journey.free_capacity_length -= item.length
-        journey.free_capacity_height -= item.height
-        journey.free_capacity_width -= item.width
-        if journey.free_capacity_weight < 0 or journey.free_capacity_length < 0 \
-                or journey.free_capacity_height < 0 or journey.free_capacity_width < 0:
-            flash('There are no free space enough for that item in the vehicle')
-        else:
-            db.session.add(item)
-            db.session.commit()
-        return redirect(url_for('.show_route', id=journey_id))
+        item1_position = None
+        if items_number >= 0:
+
+            journey = Journey.query.filter_by(id=journey_id).first()
+
+            result = placement_algorithm(form.width.data, form.height.data, form.length.data,
+                                journey.free_capacity_width, journey.free_capacity_height, journey.free_capacity_length)
+            item1_position_x = 0 - car.capacity_width / 2 + form.width.data / 2
+            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
+            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
+            journey.free_capacity_weight -= form.weight.data
+            journey.free_capacity_width -= result[0]
+            journey.free_capacity_height -= result[1]
+            journey.free_capacity_length -= result[2]
+            item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
+                        width=form.width.data, height=form.height.data, journey_id=journey_id,
+                        position_x=item1_position_x, position_y=item1_position_y, position_z=item1_position_z,
+                        target=points_list[form.target.data][1],
+                        author_id=current_user.id)
+
+            if not result[6]:
+                flash('There are no free space enough for that item in the vehicle')
+            else:
+                db.session.add(item)
+                db.session.commit()
+            return redirect(url_for('.show_route', id=journey_id))
     return render_template('add_item.html', form=form)
 
 
@@ -257,21 +270,43 @@ def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z):
         space_x = space_x
         space_y = space_y
         space_z = space_z
-        return item_x, item_y, item_z, space_x, space_y, space_z
+        return item_x, item_y, item_z, space_x, space_y, space_z, True
     elif item_x < space_x and item_y < space_y and item_z > space_z:
         if item_z < space_y and item_y < space_z:
             temp = item_y
             item_y = item_z
             item_z = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z
+            return item_x, item_y, item_z, space_x, space_y, space_z, True
         elif item_z < space_x and item_x < space_z:
             temp = item_x
             item_x = item_z
             item_z = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z
-        else:
-            flash('The are no enough available space')
-    return item_x, item_y, item_z, space_x, space_y, space_z
+            return item_x, item_y, item_z, space_x, space_y, space_z, True
+    elif item_x < space_x and item_y > space_y and item_z < space_z:
+        if item_y < space_z and item_z < space_y:
+            temp = item_z
+            item_z = item_y
+            item_y = temp
+            return item_x, item_y, item_z, space_x, space_y, space_z, True
+        elif item_y < space_x and item_x < space_y:
+            temp = item_x
+            item_x = item_y
+            item_y = temp
+            return item_x, item_y, item_z, space_x, space_y, space_z, True
+    elif item_x > space_x and item_y < space_y and item_z < space_z:
+        if item_x < space_z and item_z < space_x:
+            temp = item_z
+            item_z = item_x
+            item_x = temp
+            return item_x, item_y, item_z, space_x, space_y, space_z, True
+        elif item_x < space_y and item_y < space_x:
+            temp = item_y
+            item_y = item_x
+            item_x = temp
+            return item_x, item_y, item_z, space_x, space_y, space_z, True
+    else:
+        flash('The are no enough available space')
+    return item_x, item_y, item_z, space_x, space_y, space_z, True
 
 
 
@@ -297,12 +332,10 @@ def show_route(id):
         item1_dimension_x = items[0].width
         item1_dimension_y = items[0].height
         item1_dimension_z = items[0].length
-        result = placement_algorithm(item1_dimension_x, item1_dimension_y, item1_dimension_z,
-                                     free_space_x, free_space_y, free_space_z)
-        item1_dimension = [result[0], result[1], result[2]]
-        item1_position_x = 0 - car.capacity_width/2 + item1_dimension_x/2
-        item1_position_y = 0 - car.capacity_height/2 + item1_dimension_y/2
-        item1_position_z = 0 - car.capacity_length/2 + item1_dimension_z/2
+        item1_dimension = [item1_dimension_x, item1_dimension_y, item1_dimension_z]
+        item1_position_x = items[0].position_x
+        item1_position_y = items[0].position_y
+        item1_position_z = items[0].position_z
         item1_position = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
         used_space_x += item1_dimension_x
         used_space_y += item1_dimension_y
