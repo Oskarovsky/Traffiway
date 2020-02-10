@@ -163,6 +163,7 @@ def add_item(journey_id):
     route = Journey.query.filter_by(id=journey_id).first_or_404()
     items_number = Item.query.filter(Item.journey_id == journey_id).count()
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
+
     end_point = Journey.query.filter_by(id=journey_id).first().end_localization
     if end_point is not None:
         points.append([0, end_point])
@@ -185,6 +186,10 @@ def add_item(journey_id):
     points_list = [(j[0], j[1]) for j in available_points]
     form.target.choices = points_list
     journey = Journey.query.filter_by(id=journey_id).first()
+    used_space_x = journey.used_capacity_width
+    used_space_y = journey.used_capacity_height
+    used_space_z = journey.used_capacity_length
+
     if form.validate_on_submit():
         result = placement_algorithm(form.width.data, form.height.data, form.length.data,
                                      journey.free_capacity_width, journey.free_capacity_height,
@@ -193,7 +198,15 @@ def add_item(journey_id):
             item1_position_x = 0 - car.capacity_width / 2 + form.width.data / 2
             item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
             item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
-        if items_number == 0:
+        if items_number == 1:
+            item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
+            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
+            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
+        if items_number == 2:
+            item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
+            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
+            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
+        if items_number == 3:
             item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
             item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
             item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
@@ -203,6 +216,11 @@ def add_item(journey_id):
         journey.free_capacity_width -= result[0]
         journey.free_capacity_height -= result[1]
         journey.free_capacity_length -= result[2]
+
+        journey.used_capacity_width += result[0]
+        journey.used_capacity_height += result[1]
+        journey.used_capacity_length += result[2]
+        journey.used_capacity_weight += form.weight.data
         item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
                     width=form.width.data, height=form.height.data, journey_id=journey_id,
                     position_x=item1_position_x, position_y=item1_position_y, position_z=item1_position_z,
@@ -355,12 +373,10 @@ def show_route(id):
         item2_dimension_x = items[1].width
         item2_dimension_y = items[1].height
         item2_dimension_z = items[1].length
-        result = placement_algorithm(item2_dimension_x, item2_dimension_y, item2_dimension_z,
-                                     free_space_x, free_space_y, free_space_z)
-        item2_dimension = [result[0], result[1], result[2]]
-        item2_position_x = 0 - car.capacity_width/2 + item2_dimension_x/2 + used_space_x
-        item2_position_y = 0 - car.capacity_height/2 + item2_dimension_y/2
-        item2_position_z = 0 - car.capacity_length/2 + item2_dimension_z/2
+        item2_dimension = [item2_dimension_x, item2_dimension_y, item2_dimension_z]
+        item2_position_x = items[1].position_x
+        item2_position_y = items[1].position_y
+        item2_position_z = items[1].position_z
         item2_position = [item2_position_x, item2_position_y, item2_position_z, items[1].weight]
         used_space_x += item2_dimension_x
         used_space_y += item2_dimension_y
@@ -375,16 +391,14 @@ def show_route(id):
         item3_dimension_x = items[2].width
         item3_dimension_y = items[2].height
         item3_dimension_z = items[2].length
-        result = placement_algorithm(item3_dimension_x, item3_dimension_y, item3_dimension_z,
-                                     free_space_x, free_space_y, free_space_z)
-        item3_dimension = [result[0], result[1], result[2]]
-        item3_position_x = 0 - car.capacity_width/2 + item3_dimension_x/2 + used_space_x
-        item3_position_y = 0 - car.capacity_height/2 + item3_dimension_y/2
-        item3_position_z = 0 - car.capacity_length/2 + item3_dimension_z/2
+        item3_dimension = [item3_dimension_x, item3_dimension_y, item3_dimension_z]
+        item3_position_x = items[2].position_x
+        item3_position_y = items[2].position_x
+        item3_position_z = items[2].position_x
         item3_position = [item3_position_x, item3_position_y, item3_position_z, items[2].weight]
         used_space_x += item3_dimension_x
-        # used_space_y += item3_dimension_y
-        # used_space_z += item3_dimension_z
+        used_space_y += item3_dimension_y
+        used_space_z += item3_dimension_z
         free_space_x = free_space_x - used_space_x
         free_space_y = free_space_y - used_space_y
         free_space_z = free_space_z - used_space_z
@@ -395,16 +409,14 @@ def show_route(id):
         item4_dimension_x = items[3].width
         item4_dimension_y = items[3].height
         item4_dimension_z = items[3].length
-        result = placement_algorithm(item4_dimension_x, item4_dimension_y, item4_dimension_z,
-                                     free_space_x, free_space_y, free_space_z)
-        item4_dimension = [result[0], result[1], result[2]]
-        item4_position_x = 0 - car.capacity_width/2 + item4_dimension_x/2 + used_space_x
-        item4_position_y = 0 - car.capacity_height/2 + item4_dimension_y/2
-        item4_position_z = 0 - car.capacity_length/2 + item4_dimension_z/2
+        item4_dimension = [item4_dimension_x, item4_dimension_y, item4_dimension_z]
+        item4_position_x = items[3].position_x
+        item4_position_y = items[3].position_x
+        item4_position_z = items[3].position_x
         item4_position = [item4_position_x, item4_position_y, item4_position_z, items[2].weight]
         used_space_x += item4_dimension_x
-        # used_space_y += item4_dimension_y
-        # used_space_z += item4_dimension_z
+        used_space_y += item4_dimension_y
+        used_space_z += item4_dimension_z
         free_space_x = free_space_x - used_space_x
         free_space_y = free_space_y - used_space_y
         free_space_z = free_space_z - used_space_z
@@ -606,6 +618,8 @@ def map():
                           next_point_positions3=json.dumps(next_point_positions3) or None,
                           next_point_positions4=json.dumps(next_point_positions4) or None,
                           next_point_positions5=json.dumps(next_point_positions5) or None,
+                          used_capacity_height=0, used_capacity_length=0,
+                          used_capacity_weight=0, used_capacity_width=0,
                           free_capacity_length=free_capacity_length,
                           free_capacity_weight=free_capacity_weight,
                           free_capacity_width=free_capacity_width,
