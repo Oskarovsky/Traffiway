@@ -8,6 +8,7 @@ import googlemaps
 #import tkinter
 import numpy
 import matplotlib.pyplot as plt
+from markupsafe import Markup
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 
@@ -575,7 +576,8 @@ def map():
 
         db.session.add(journey)
         db.session.commit()
-        flash('This route has been added to the database')
+        flash(Markup('This route has been added to the database - <a href="/route/'
+                     + str(journey.id) + '" class="alert-link">Show the route</a>'))
 
         return render_template('map.html', form=form,
                                start_point=start_dict_json, next_point=end_dict_json,
