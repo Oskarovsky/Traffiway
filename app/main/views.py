@@ -193,11 +193,12 @@ def add_item(journey_id):
     if form.validate_on_submit():
         result = placement_algorithm(form.width.data, form.height.data, form.length.data,
                                      journey.free_capacity_width, journey.free_capacity_height,
-                                     journey.free_capacity_length)
+                                     journey.free_capacity_length, car.capacity_width,
+                                     car.capacity_height, car.capacity_length)
         if items_number == 0:
-            item1_position_x = 0 - car.capacity_width / 2 + form.width.data / 2
-            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
-            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
+            item1_position_x = result[6]
+            item1_position_y = result[7]
+            item1_position_z = result[8]
         if items_number == 1:
             item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
             item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
@@ -227,7 +228,7 @@ def add_item(journey_id):
                     target=points_list[form.target.data][1],
                     author_id=current_user.id)
 
-        if not result[6]:
+        if not result[9]:
             flash('There are no free space enough for that item in the vehicle')
         else:
             db.session.add(item)
@@ -288,12 +289,12 @@ def cargo(id):
     return render_template('cargo.html', route=route, car=car)
 
 
-def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z):
+def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z, capacity_x, capacity_y, capacity_z):
     if item_x < space_x and item_y < space_y and item_z < space_z:
-        space_x = space_x
-        space_y = space_y
-        space_z = space_z
-        return item_x, item_y, item_z, space_x, space_y, space_z, True
+        position_x = 0 - capacity_x/2 + item_x/2
+        position_y = 0 - capacity_y/2 + item_y/2
+        position_z = 0 - capacity_z/2 + item_z/2
+        return item_x, item_y, item_z, space_x, space_y, space_z, position_x, position_y, position_z, True
     elif item_x < space_x and item_y < space_y and item_z > space_z:
         if item_z < space_y and item_y < space_z:
             temp = item_y
