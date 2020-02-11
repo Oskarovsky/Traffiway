@@ -194,33 +194,26 @@ def add_item(journey_id):
         result = placement_algorithm(form.width.data, form.height.data, form.length.data,
                                      journey.free_capacity_width, journey.free_capacity_height,
                                      journey.free_capacity_length, car.capacity_width,
-                                     car.capacity_height, car.capacity_length)
+                                     car.capacity_height, car.capacity_length, used_space_x,
+                                     used_space_y, used_space_z)
         if items_number == 0:
             item1_position_x = result[6]
             item1_position_y = result[7]
             item1_position_z = result[8]
-        if items_number == 1:
-            item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
-            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
-            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
-        if items_number == 2:
-            item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
-            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
-            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
-        if items_number == 3:
-            item1_position_x = 0 - car.capacity_width/ 2 + form.width.data/2 + used_space_x
-            item1_position_y = 0 - car.capacity_height / 2 + form.height.data / 2
-            item1_position_z = 0 - car.capacity_length / 2 + form.length.data / 2
+        if items_number >= 1:
+            item1_position_x = result[6]
+            item1_position_y = result[7]
+            item1_position_z = result[8]
 
 
         journey.free_capacity_weight -= form.weight.data
-        journey.free_capacity_width -= result[0]
-        journey.free_capacity_height -= result[1]
-        journey.free_capacity_length -= result[2]
+        journey.free_capacity_width -= result[9]
+        journey.free_capacity_height -= result[10]
+        journey.free_capacity_length -= result[11]
 
-        journey.used_capacity_width += result[0]
-        journey.used_capacity_height += result[1]
-        journey.used_capacity_length += result[2]
+        journey.used_capacity_width += result[9]
+        journey.used_capacity_height += result[10]
+        journey.used_capacity_length += result[11]
         journey.used_capacity_weight += form.weight.data
         item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
                     width=form.width.data, height=form.height.data, journey_id=journey_id,
@@ -228,7 +221,7 @@ def add_item(journey_id):
                     target=points_list[form.target.data][1],
                     author_id=current_user.id)
 
-        if not result[9]:
+        if not result[12]:
             flash('There are no free space enough for that item in the vehicle')
         else:
             db.session.add(item)
@@ -289,48 +282,95 @@ def cargo(id):
     return render_template('cargo.html', route=route, car=car)
 
 
-def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z, capacity_x, capacity_y, capacity_z):
+def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
+                        capacity_x, capacity_y, capacity_z, used_x, used_y, used_z):
     if item_x < space_x and item_y < space_y and item_z < space_z:
-        position_x = 0 - capacity_x/2 + item_x/2
+        position_x = 0 - capacity_x/2 + item_x/2 + used_x
         position_y = 0 - capacity_y/2 + item_y/2
         position_z = 0 - capacity_z/2 + item_z/2
-        return item_x, item_y, item_z, space_x, space_y, space_z, position_x, position_y, position_z, True
+        used_x += item_x
+        used_y += space_y-item_y
+        used_z += 0
+        return item_x, item_y, item_z, space_x, space_y, space_z, \
+               position_x, position_y, position_z, used_x, used_y, used_z, True
     elif item_x < space_x and item_y < space_y and item_z > space_z:
         if item_z < space_y and item_y < space_z:
             temp = item_y
             item_y = item_z
             item_z = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z, True
+            position_x = 0 - capacity_x / 2 + item_x / 2 + used_x
+            position_y = 0 - capacity_y / 2 + item_y / 2
+            position_z = 0 - capacity_z / 2 + item_z / 2
+            used_x += item_x
+            used_y += space_y - item_y
+            used_z += 0
+            return item_x, item_y, item_z, space_x, space_y, space_z, \
+                   position_x, position_y, position_z, used_x, used_y, used_z, True
         elif item_z < space_x and item_x < space_z:
             temp = item_x
             item_x = item_z
             item_z = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z, True
+            position_x = 0 - capacity_x / 2 + item_x / 2 + used_x
+            position_y = 0 - capacity_y / 2 + item_y / 2
+            position_z = 0 - capacity_z / 2 + item_z / 2
+            used_x += item_x
+            used_y += space_y - item_y
+            used_z += 0
+            return item_x, item_y, item_z, space_x, space_y, space_z, \
+                   position_x, position_y, position_z, used_x, used_y, used_z, True
     elif item_x < space_x and item_y > space_y and item_z < space_z:
         if item_y < space_z and item_z < space_y:
             temp = item_z
             item_z = item_y
             item_y = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z, True
+            position_x = 0 - capacity_x / 2 + item_x / 2 + used_x
+            position_y = 0 - capacity_y / 2 + item_y / 2
+            position_z = 0 - capacity_z / 2 + item_z / 2
+            used_x += item_x
+            used_y += space_y - item_y
+            used_z += 0
+            return item_x, item_y, item_z, space_x, space_y, space_z, \
+                   position_x, position_y, position_z, used_x, used_y, used_z, True
         elif item_y < space_x and item_x < space_y:
             temp = item_x
             item_x = item_y
             item_y = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z, True
+            position_x = 0 - capacity_x / 2 + item_x / 2 + used_x
+            position_y = 0 - capacity_y / 2 + item_y / 2
+            position_z = 0 - capacity_z / 2 + item_z / 2
+            used_x += item_x
+            used_y += space_y - item_y
+            used_z += 0
+            return item_x, item_y, item_z, space_x, space_y, space_z, \
+                   position_x, position_y, position_z, used_x, used_y, used_z, True
     elif item_x > space_x and item_y < space_y and item_z < space_z:
         if item_x < space_z and item_z < space_x:
             temp = item_z
             item_z = item_x
             item_x = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z, True
+            position_x = 0 - capacity_x / 2 + item_x / 2 + used_x
+            position_y = 0 - capacity_y / 2 + item_y / 2
+            position_z = 0 - capacity_z / 2 + item_z / 2
+            used_x += item_x
+            used_y += space_y - item_y
+            used_z += 0
+            return item_x, item_y, item_z, space_x, space_y, space_z, \
+                   position_x, position_y, position_z, used_x, used_y, used_z, True
         elif item_x < space_y and item_y < space_x:
             temp = item_y
             item_y = item_x
             item_x = temp
-            return item_x, item_y, item_z, space_x, space_y, space_z, True
+            position_x = 0 - capacity_x / 2 + item_x / 2 + used_x
+            position_y = 0 - capacity_y / 2 + item_y / 2
+            position_z = 0 - capacity_z / 2 + item_z / 2
+            used_x += item_x
+            used_y += space_y - item_y
+            used_z += 0
+            return item_x, item_y, item_z, space_x, space_y, space_z, \
+                   position_x, position_y, position_z, used_x, used_y, used_z, True
     else:
         flash('The are no enough available space')
-    return item_x, item_y, item_z, space_x, space_y, space_z, True
+        return redirect(url_for('main.index'))
 
 
 
