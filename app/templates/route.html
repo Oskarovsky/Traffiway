@@ -165,6 +165,24 @@
         scene.add( item4 );
         {% endif %}
 
+        {% if items_number >= 5 %}
+        var item5_dimension_x = parseFloat({{ item5_dimension[0] }});
+        var item5_dimension_y = parseFloat({{ item5_dimension[1] }});
+        var item5_dimension_z = parseFloat({{ item5_dimension[2] }});
+        var geometry5 = new THREE.BoxGeometry( item5_dimension_x, item5_dimension_y, item5_dimension_z );
+        var material5 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
+        var item5 = new THREE.Mesh(5, material5);
+
+        item5_position_x = parseFloat({{ item4_position[0] }});      // width
+        item5_position_y = parseFloat({{ item4_position[1] }});      // height
+        item5_position_z = parseFloat({{ item4_position[2] }});      // length
+        item5_weight = parseFloat({{ item4_position[3] }});          // weight
+        item5.position.x = item5_position_x;
+        item5.position.y = item5_position_y;
+        item5.position.z = item5_position_z;
+        scene.add( item5 );
+        {% endif %}
+
 
 
         var material = new THREE.MeshFaceMaterial(cargoMaterials);

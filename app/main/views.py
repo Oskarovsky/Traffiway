@@ -193,33 +193,29 @@ def add_item(journey_id):
     if form.validate_on_submit():
         result = placement_algorithm(form.width.data, form.height.data, form.length.data,
                                      journey.free_capacity_width, journey.free_capacity_height,
-                                     journey.free_capacity_length, car.capacity_width,
-                                     car.capacity_height, car.capacity_length, used_space_x,
-                                     used_space_y, used_space_z)
-        if items_number == 0:
-            item1_position_x = result[6]
-            item1_position_y = result[7]
-            item1_position_z = result[8]
-        if items_number >= 1:
-            item1_position_x = result[6]
-            item1_position_y = result[7]
-            item1_position_z = result[8]
+                                     journey.free_capacity_length,
+                                     car.capacity_width, car.capacity_height, car.capacity_length,
+                                     used_space_x, used_space_y, used_space_z)
+        print(result)
 
+        item1_position_x = result[6]
+        item1_position_y = result[7]
+        item1_position_z = result[8]
 
         journey.free_capacity_weight -= form.weight.data
-        journey.free_capacity_width -= result[9]
-        journey.free_capacity_height -= result[10]
-        journey.free_capacity_length -= result[11]
+        journey.free_capacity_width = car.capacity_width - result[9]
+        journey.free_capacity_height = car.capacity_height - result[10]
+        journey.free_capacity_length = car.capacity_length - result[11]
 
-        journey.used_capacity_width += result[9]
-        journey.used_capacity_height += result[10]
-        journey.used_capacity_length += result[11]
         journey.used_capacity_weight += form.weight.data
+        journey.used_capacity_width = result[9]
+        journey.used_capacity_height = result[10]
+        journey.used_capacity_length = result[11]
+
         item = Item(name=form.name.data, info=form.info.data, weight=form.weight.data, length=form.length.data,
                     width=form.width.data, height=form.height.data, journey_id=journey_id,
                     position_x=item1_position_x, position_y=item1_position_y, position_z=item1_position_z,
-                    target=points_list[form.target.data][1],
-                    author_id=current_user.id)
+                    target=points_list[form.target.data][1], author_id=current_user.id)
 
         if not result[12]:
             flash('There are no free space enough for that item in the vehicle')
@@ -282,19 +278,19 @@ def cargo(id):
     return render_template('cargo.html', route=route, car=car)
 
 
-def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
+def placement_algorithm(item_x, item_y, item_z, free_space_x, free_space_y, free_space_z,
                         capacity_x, capacity_y, capacity_z, used_x, used_y, used_z):
-    if item_x < space_x and item_y < space_y and item_z < space_z:
+    if item_x < free_space_x and item_y < free_space_y and item_z < free_space_z:
         position_x = 0 - capacity_x/2 + item_x/2 + used_x
         position_y = 0 - capacity_y/2 + item_y/2
         position_z = 0 - capacity_z/2 + item_z/2
         used_x += item_x
-        used_y += space_y-item_y
+        used_y += item_y
         used_z += 0
-        return item_x, item_y, item_z, space_x, space_y, space_z, \
+        return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
                position_x, position_y, position_z, used_x, used_y, used_z, True
-    elif item_x < space_x and item_y < space_y and item_z > space_z:
-        if item_z < space_y and item_y < space_z:
+    elif item_x < free_space_x and item_y < free_space_y and item_z > free_space_z:
+        if item_z < free_space_y and item_y < free_space_z:
             temp = item_y
             item_y = item_z
             item_z = temp
@@ -302,11 +298,11 @@ def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
             position_y = 0 - capacity_y / 2 + item_y / 2
             position_z = 0 - capacity_z / 2 + item_z / 2
             used_x += item_x
-            used_y += space_y - item_y
+            used_y += item_y
             used_z += 0
-            return item_x, item_y, item_z, space_x, space_y, space_z, \
+            return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
                    position_x, position_y, position_z, used_x, used_y, used_z, True
-        elif item_z < space_x and item_x < space_z:
+        elif item_z < free_space_x and item_x < free_space_z:
             temp = item_x
             item_x = item_z
             item_z = temp
@@ -314,12 +310,12 @@ def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
             position_y = 0 - capacity_y / 2 + item_y / 2
             position_z = 0 - capacity_z / 2 + item_z / 2
             used_x += item_x
-            used_y += space_y - item_y
+            used_y += item_y
             used_z += 0
-            return item_x, item_y, item_z, space_x, space_y, space_z, \
+            return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
                    position_x, position_y, position_z, used_x, used_y, used_z, True
-    elif item_x < space_x and item_y > space_y and item_z < space_z:
-        if item_y < space_z and item_z < space_y:
+    elif item_x < free_space_x and item_y > free_space_y and item_z < free_space_z:
+        if item_y < free_space_z and item_z < free_space_y:
             temp = item_z
             item_z = item_y
             item_y = temp
@@ -327,11 +323,11 @@ def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
             position_y = 0 - capacity_y / 2 + item_y / 2
             position_z = 0 - capacity_z / 2 + item_z / 2
             used_x += item_x
-            used_y += space_y - item_y
+            used_y += free_space_y - item_y
             used_z += 0
-            return item_x, item_y, item_z, space_x, space_y, space_z, \
+            return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
                    position_x, position_y, position_z, used_x, used_y, used_z, True
-        elif item_y < space_x and item_x < space_y:
+        elif item_y < free_space_x and item_x < free_space_y:
             temp = item_x
             item_x = item_y
             item_y = temp
@@ -339,12 +335,12 @@ def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
             position_y = 0 - capacity_y / 2 + item_y / 2
             position_z = 0 - capacity_z / 2 + item_z / 2
             used_x += item_x
-            used_y += space_y - item_y
+            used_y += free_space_y - item_y
             used_z += 0
-            return item_x, item_y, item_z, space_x, space_y, space_z, \
+            return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
                    position_x, position_y, position_z, used_x, used_y, used_z, True
-    elif item_x > space_x and item_y < space_y and item_z < space_z:
-        if item_x < space_z and item_z < space_x:
+    elif item_x > free_space_x and item_y < free_space_y and item_z < free_space_z:
+        if item_x < free_space_z and item_z < free_space_x:
             temp = item_z
             item_z = item_x
             item_x = temp
@@ -352,11 +348,11 @@ def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
             position_y = 0 - capacity_y / 2 + item_y / 2
             position_z = 0 - capacity_z / 2 + item_z / 2
             used_x += item_x
-            used_y += space_y - item_y
+            used_y += item_y
             used_z += 0
-            return item_x, item_y, item_z, space_x, space_y, space_z, \
+            return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
                    position_x, position_y, position_z, used_x, used_y, used_z, True
-        elif item_x < space_y and item_y < space_x:
+        elif item_x < free_space_y and item_y < free_space_x:
             temp = item_y
             item_y = item_x
             item_x = temp
@@ -364,13 +360,18 @@ def placement_algorithm(item_x, item_y, item_z, space_x, space_y, space_z,
             position_y = 0 - capacity_y / 2 + item_y / 2
             position_z = 0 - capacity_z / 2 + item_z / 2
             used_x += item_x
-            used_y += space_y - item_y
+            used_y += item_y
             used_z += 0
-            return item_x, item_y, item_z, space_x, space_y, space_z, \
+            return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
                    position_x, position_y, position_z, used_x, used_y, used_z, True
     else:
         flash('The are no enough available space')
-        return redirect(url_for('main.index'))
+        #return redirect(url_for('main.index'))
+        position_x = 0
+        position_y = 0
+        position_z = 0
+        return item_x, item_y, item_z, free_space_x, free_space_y, free_space_z, \
+               position_x, position_y, position_z, used_x, used_y, used_z, True
 
 
 
@@ -383,13 +384,6 @@ def show_route(id):
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
-    used_space_x = 0
-    used_space_y = 0
-    used_space_z = 0
-    free_space_x = route.free_capacity_width
-    free_space_y = route.free_capacity_height
-    free_space_z = route.free_capacity_length
-    free_weight = route.free_capacity_weight
     item1_dimension = None
     item1_position = None
     if items_number >= 1:
@@ -401,12 +395,6 @@ def show_route(id):
         item1_position_y = items[0].position_y
         item1_position_z = items[0].position_z
         item1_position = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
-        used_space_x += item1_dimension_x
-        used_space_y += item1_dimension_y
-        used_space_z += item1_dimension_z
-        free_space_x = free_space_x - used_space_x
-        free_space_y = free_space_y - used_space_y
-        free_space_z = free_space_z - used_space_z
 
     item2_dimension = None
     item2_position = None
@@ -419,12 +407,7 @@ def show_route(id):
         item2_position_y = items[1].position_y
         item2_position_z = items[1].position_z
         item2_position = [item2_position_x, item2_position_y, item2_position_z, items[1].weight]
-        used_space_x += item2_dimension_x
-        used_space_y += item2_dimension_y
-        used_space_z += item2_dimension_z
-        free_space_x = free_space_x - used_space_x
-        free_space_y = free_space_y - used_space_y
-        free_space_z = free_space_z - used_space_z
+
 
     item3_dimension = None
     item3_position = None
@@ -434,15 +417,9 @@ def show_route(id):
         item3_dimension_z = items[2].length
         item3_dimension = [item3_dimension_x, item3_dimension_y, item3_dimension_z]
         item3_position_x = items[2].position_x
-        item3_position_y = items[2].position_x
-        item3_position_z = items[2].position_x
-        item3_position = [item3_position_x, item3_position_y, item3_position_z, items[2].weight]
-        used_space_x += item3_dimension_x
-        used_space_y += item3_dimension_y
-        used_space_z += item3_dimension_z
-        free_space_x = free_space_x - used_space_x
-        free_space_y = free_space_y - used_space_y
-        free_space_z = free_space_z - used_space_z
+        item3_position_y = items[2].position_y
+        item3_position_z = items[2].position_z
+        item3_position = [item3_position_x, item3_position_y, item3_position_z, items[3].weight]
 
     item4_dimension = None
     item4_position = None
@@ -452,22 +429,29 @@ def show_route(id):
         item4_dimension_z = items[3].length
         item4_dimension = [item4_dimension_x, item4_dimension_y, item4_dimension_z]
         item4_position_x = items[3].position_x
-        item4_position_y = items[3].position_x
-        item4_position_z = items[3].position_x
-        item4_position = [item4_position_x, item4_position_y, item4_position_z, items[2].weight]
-        used_space_x += item4_dimension_x
-        used_space_y += item4_dimension_y
-        used_space_z += item4_dimension_z
-        free_space_x = free_space_x - used_space_x
-        free_space_y = free_space_y - used_space_y
-        free_space_z = free_space_z - used_space_z
+        item4_position_y = items[3].position_y
+        item4_position_z = items[3].position_z
+        item4_position = [item4_position_x, item4_position_y, item4_position_z, items[4].weight]
+
+    item5_dimension = None
+    item5_position = None
+    if items_number >= 5:
+        item5_dimension_x = items[4].width
+        item5_dimension_y = items[4].height
+        item5_dimension_z = items[4].length
+        item5_dimension = [item5_dimension_x, item5_dimension_y, item5_dimension_z]
+        item5_position_x = items[4].position_x
+        item5_position_y = items[4].position_y
+        item5_position_z = items[4].position_z
+        item5_position = [item5_position_x, item5_position_y, item5_position_z, items[5].weight]
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list), items_number=items_number,
                            item1_position=item1_position, item1_dimension=item1_dimension,
                            item2_position=item2_position, item2_dimension=item2_dimension,
                            item3_position=item3_position, item3_dimension=item3_dimension,
-                           item4_position=item4_position, item4_dimension=item4_dimension)
+                           item4_position=item4_position, item4_dimension=item4_dimension,
+                           item5_position=item5_position, item5_dimension=item5_dimension)
 
 
 @main.route('/map', methods=['GET', 'POST'])
