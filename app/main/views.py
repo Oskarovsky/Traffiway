@@ -61,8 +61,7 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
     pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
-        page, per_page=current_app.config['TRAFFIWAY_POSTS_PER_PAGE'],
-        error_out=False)
+        page, per_page=current_app.config['TRAFFIWAY_POSTS_PER_PAGE'], error_out=False)
     posts = pagination.items
     return render_template('user.html', user=user, posts=posts, pagination=pagination)
 
@@ -147,7 +146,6 @@ def add_item(journey_id):
     form = ItemForm()
     points = []
     route = Journey.query.filter_by(id=journey_id).first_or_404()
-    items_number = Item.query.filter(Item.journey_id == journey_id).count()
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
 
     end_point = Journey.query.filter_by(id=journey_id).first().end_localization
@@ -352,7 +350,6 @@ def placement_algorithm(item_x, item_y, item_z, free_space_x, free_space_y, free
                    position_x, position_y, position_z, used_x, used_y, used_z, True
     else:
         flash('The are no enough available space')
-        #return redirect(url_for('main.index'))
         position_x = 0
         position_y = 0
         position_z = 0
@@ -415,6 +412,15 @@ def map():
         free_capacity_weight = selected_car.capacity_weight
         free_capacity_width = selected_car.capacity_width
         free_capacity_height = selected_car.capacity_height
+
+        all_place = []
+        for field, value in form.data.items():
+            if value is "" or value is None:
+                continue
+            if isinstance(value, str):
+                if field.startswith("next") or field.startswith("start") or field.startswith("end"):
+                    all_place.append(value)
+                    print(field, value)
 
         next_place1 = form.next_place1.data or None
         next_point_positions1 = None
