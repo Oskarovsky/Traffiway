@@ -384,55 +384,15 @@ def show_route(id):
     car = Car.query.filter(Car.id == route.car_id).first_or_404()
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
-    item1_dimension = None
-    item1_position = None
-    item_dimension = []
-    item_position = []
     item_parameters = []
     iterator = 0
     for item in items:
         item_parameters.append([items[iterator].width, items[iterator].height, items[iterator].length,
                                 items[iterator].position_x, items[iterator].position_y, items[iterator].position_z])
         iterator += 1
-        print(item)
-    print(item_parameters)
-    if items_number >= 1:
-        item1_dimension = [items[0].width, items[0].height, items[0].length]
-        item1_position = [items[0].position_x, items[0].position_y, items[0].position_z]
-
-    item2_dimension = None
-    item2_position = None
-    if items_number >= 2:
-        item2_dimension = [items[1].width, items[1].height, items[1].length]
-        item2_position = [items[1].position_x, items[1].position_y, items[1].position_z]
-
-
-    item3_dimension = None
-    item3_position = None
-    if items_number >= 3:
-        item3_dimension = [items[2].width, items[2].height, items[2].length]
-        item3_position = [items[2].position_x, items[2].position_y, items[2].position_z]
-
-    item4_dimension = None
-    item4_position = None
-    if items_number >= 4:
-        item4_dimension = [items[3].width, items[3].height, items[3].length]
-        item4_position = [items[3].position_x, items[3].position_y, items[3].position_z]
-
-    item5_dimension = None
-    item5_position = None
-    if items_number >= 5:
-        item5_dimension = [items[4].width, items[4].height, items[4].length]
-        item5_position = [items[4].position_x, items[4].position_y, items[4].position_z]
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list), items_number=items_number,
-                           item1_position=item1_position, item1_dimension=item1_dimension,
-                           item2_position=item2_position, item2_dimension=item2_dimension,
-                           item3_position=item3_position, item3_dimension=item3_dimension,
-                           item4_position=item4_position, item4_dimension=item4_dimension,
-                           item5_position=item5_position, item5_dimension=item5_dimension,
-                           item_dimension=item_dimension, item_position=item_position,
                            item_parameters=item_parameters)
 
 
