@@ -389,6 +389,35 @@ def map():
     form.car_id.choices = vehicles_list
 
     if form.validate_on_submit():
+
+        # localizations = []
+        # for field, value in form.data.items():
+        #     if value is "" or value is None:
+        #         continue
+        #     if isinstance(value, str):
+        #         temp_counter += 1
+        #         if field.startswith("start"):
+        #             point = geocoderApi.free_form(value)
+        #             dict = json.loads(point.as_json_string())
+        #             dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+        #             point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
+        #             localizations.insert(0, [value, json.dumps(point_positions)])
+        #             #print(json.dumps(point_positions), value)
+        #         elif field.startswith("end"):
+        #             point = geocoderApi.free_form(value)
+        #             dict = json.loads(point.as_json_string())
+        #             dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+        #             point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
+        #             localizations.insert(1, [value, json.dumps(point_positions)])
+        #         elif field.startswith("next"):
+        #             point = geocoderApi.free_form(value)
+        #             dict = json.loads(point.as_json_string())
+        #             dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+        #             point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
+        #             localizations.append([value, json.dumps(point_positions)])
+        # print(localizations)
+
+
         start_place = form.start_place.data
         start_point = geocoderApi.free_form(start_place)
         start_dict = json.loads(start_point.as_json_string())
@@ -412,19 +441,6 @@ def map():
         free_capacity_weight = selected_car.capacity_weight
         free_capacity_width = selected_car.capacity_width
         free_capacity_height = selected_car.capacity_height
-
-        all_place = []
-        for field, value in form.data.items():
-            if value is "" or value is None:
-                continue
-            if isinstance(value, str):
-                if field.startswith("start"):
-                    all_place.insert(0, value)
-                elif field.startswith("end"):
-                    all_place.insert(1, value)
-                elif field.startswith("next"):
-                    all_place.append(value)
-                print(field, value)
 
         next_place1 = form.next_place1.data or None
         next_point_positions1 = None
