@@ -1,35 +1,21 @@
-import base64
-import io
+import json
 import json
 import os
-import tempfile
-import googlemaps
-
-#import tkinter
-import numpy
-import matplotlib.pyplot as plt
-from markupsafe import Markup
-from mpl_toolkits.mplot3d import Axes3D
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
-
-import herepy
 from datetime import datetime
-from sqlalchemy import text
 
-import requests
-
-from flask import render_template, session, redirect, url_for, current_app, flash, request, jsonify, make_response
+import googlemaps
+import herepy
+from flask import render_template, redirect, url_for, current_app, flash, request
 from flask_login import login_required, current_user
-from wtforms import ValidationError
+# import tkinter
+from markupsafe import Markup
 from werkzeug.utils import secure_filename
 
 from . import main
-from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, MapForm, ItemForm, CarForm
-
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, MapForm, ItemForm, CarForm
 from .. import db
 from ..decorators import admin_required
 from ..models import User, Role, Post, Danger, Item, Journey, Car
-from ..email import send_email
 
 geocoderApi = herepy.GeocoderApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
 routingApi = herepy.RoutingApi('Wtz4pThMbs_tIMzmaBfNlIIB39uWirtBfi55snakm-M')
