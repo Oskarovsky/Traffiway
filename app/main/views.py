@@ -418,9 +418,13 @@ def map():
             if value is "" or value is None:
                 continue
             if isinstance(value, str):
-                if field.startswith("next") or field.startswith("start") or field.startswith("end"):
+                if field.startswith("start"):
+                    all_place.insert(0, value)
+                elif field.startswith("end"):
+                    all_place.insert(1, value)
+                elif field.startswith("next"):
                     all_place.append(value)
-                    print(field, value)
+                print(field, value)
 
         next_place1 = form.next_place1.data or None
         next_point_positions1 = None
