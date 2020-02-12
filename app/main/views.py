@@ -388,14 +388,14 @@ def show_route(id):
     item1_position = None
     item_dimension = []
     item_position = []
+    item_parameters = []
     iterator = 0
     for item in items:
-        item_dimension.append([items[iterator].width, items[iterator].height, items[iterator].length])
-        item_position.append([items[iterator].position_x, items[iterator].position_y, items[iterator].position_z])
+        item_parameters.append([items[iterator].width, items[iterator].height, items[iterator].length,
+                                items[iterator].position_x, items[iterator].position_y, items[iterator].position_z])
         iterator += 1
         print(item)
-    print(item_dimension)
-    print(item_position)
+    print(item_parameters)
     if items_number >= 1:
         item1_dimension = [items[0].width, items[0].height, items[0].length]
         item1_position = [items[0].position_x, items[0].position_y, items[0].position_z]
@@ -432,7 +432,8 @@ def show_route(id):
                            item3_position=item3_position, item3_dimension=item3_dimension,
                            item4_position=item4_position, item4_dimension=item4_dimension,
                            item5_position=item5_position, item5_dimension=item5_dimension,
-                           item_dimension=item_dimension, item_position=item_position)
+                           item_dimension=item_dimension, item_position=item_position,
+                           item_parameters=item_parameters)
 
 
 @main.route('/map', methods=['GET', 'POST'])

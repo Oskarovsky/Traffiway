@@ -93,101 +93,15 @@
             new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide }), // BACK SIDE
         ];
 
-        {% for width, height, length in item_dimension %}
-            var iteration = {{ loop.index }} - 1;
-            scene.add( new THREE.Mesh(new THREE.BoxGeometry( parseFloat({{ width }}), parseFloat({{ height }}), parseFloat({{ length }}) ),
-                new THREE.MeshBasicMaterial({color: 0x4FDCCC, wireframe: true})) );
+        {% for width, height, length, x, y, z in item_parameters %}
+            var item = new THREE.Mesh(
+                        new THREE.BoxGeometry( parseFloat({{ width }}), parseFloat({{ height }}), parseFloat({{ length }}) ),
+                        new THREE.MeshBasicMaterial({color: 0x4FDCCC, wireframe: true}));
+                item.position.x = parseFloat({{ x }});
+                item.position.y = parseFloat({{ y }});
+                item.position.z = parseFloat({{ z }});
+                scene.add( item );
         {% endfor %}
-
-{#        {% if items_number >= 1 %}
-        var item1_dimension_x = parseFloat({{ item1_dimension[0] }});
-        var item1_dimension_y = parseFloat({{ item1_dimension[1] }});
-        var item1_dimension_z = parseFloat({{ item1_dimension[2] }});
-        var geometry1 = new THREE.BoxGeometry( item1_dimension_x, item1_dimension_y, item1_dimension_z );
-        var material1 = new THREE.MeshBasicMaterial({color: 0x4FDCCC, wireframe: true});
-        var item1 = new THREE.Mesh(geometry1, material1);
-
-        item1_position_x = parseFloat({{ item1_position[0] }});      // width
-        item1_position_y = parseFloat({{ item1_position[1] }});      // height
-        item1_position_z = parseFloat({{ item1_position[2] }});      // length
-        item1_weight = parseFloat({{ item1_position[3] }});          // weight
-        item1.position.x = item1_position_x;
-        item1.position.y = item1_position_y;
-        item1.position.z = item1_position_z;
-        scene.add( item1 );
-        {% endif %}#}
-
-        {% if items_number >= 2 %}
-        var item2_dimension_x = parseFloat({{ item2_dimension[0] }});
-        var item2_dimension_y = parseFloat({{ item2_dimension[1] }});
-        var item2_dimension_z = parseFloat({{ item2_dimension[2] }});
-        var geometry2 = new THREE.BoxGeometry( item2_dimension_x, item2_dimension_y, item2_dimension_z );
-        var material2 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
-        var item2 = new THREE.Mesh(geometry2, material2);
-
-        item2_position_x = parseFloat({{ item2_position[0] }});      // width
-        item2_position_y = parseFloat({{ item2_position[1] }});      // height
-        item2_position_z = parseFloat({{ item2_position[2] }});      // length
-        item2_weight = parseFloat({{ item2_position[3] }});          // weight
-        item2.position.x = item2_position_x;
-        item2.position.y = item2_position_y;
-        item2.position.z = item2_position_z;
-        scene.add( item2 );
-        {% endif %}
-
-        {% if items_number >= 3 %}
-        var item3_dimension_x = parseFloat({{ item3_dimension[0] }});
-        var item3_dimension_y = parseFloat({{ item3_dimension[1] }});
-        var item3_dimension_z = parseFloat({{ item3_dimension[2] }});
-        var geometry3 = new THREE.BoxGeometry( item3_dimension_x, item3_dimension_y, item3_dimension_z );
-        var material3 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
-        var item3 = new THREE.Mesh(geometry3, material3);
-
-        item3_position_x = parseFloat({{ item3_position[0] }});      // width
-        item3_position_y = parseFloat({{ item3_position[1] }});      // height
-        item3_position_z = parseFloat({{ item3_position[2] }});      // length
-        item3_weight = parseFloat({{ item3_position[3] }});          // weight
-        item3.position.x = item3_position_x;
-        item3.position.y = item3_position_y;
-        item3.position.z = item3_position_z;
-        scene.add( item3 );
-        {% endif %}
-
-        {% if items_number >= 4 %}
-        var item4_dimension_x = parseFloat({{ item4_dimension[0] }});
-        var item4_dimension_y = parseFloat({{ item4_dimension[1] }});
-        var item4_dimension_z = parseFloat({{ item4_dimension[2] }});
-        var geometry4 = new THREE.BoxGeometry( item4_dimension_x, item4_dimension_y, item4_dimension_z );
-        var material4 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
-        var item4 = new THREE.Mesh(geometry4, material4);
-
-        item4_position_x = parseFloat({{ item4_position[0] }});      // width
-        item4_position_y = parseFloat({{ item4_position[1] }});      // height
-        item4_position_z = parseFloat({{ item4_position[2] }});      // length
-        item4_weight = parseFloat({{ item4_position[3] }});          // weight
-        item4.position.x = item4_position_x;
-        item4.position.y = item4_position_y;
-        item4.position.z = item4_position_z;
-        scene.add( item4 );
-        {% endif %}
-
-        {% if items_number >= 5 %}
-        var item5_dimension_x = parseFloat({{ item5_dimension[0] }});
-        var item5_dimension_y = parseFloat({{ item5_dimension[1] }});
-        var item5_dimension_z = parseFloat({{ item5_dimension[2] }});
-        var geometry5 = new THREE.BoxGeometry( item5_dimension_x, item5_dimension_y, item5_dimension_z );
-        var material5 = new THREE.MeshBasicMaterial({color: 0xCCCCCC, wireframe: true});
-        var item5 = new THREE.Mesh(5, material5);
-
-        item5_position_x = parseFloat({{ item4_position[0] }});      // width
-        item5_position_y = parseFloat({{ item4_position[1] }});      // height
-        item5_position_z = parseFloat({{ item4_position[2] }});      // length
-        item5_weight = parseFloat({{ item4_position[3] }});          // weight
-        item5.position.x = item5_position_x;
-        item5.position.y = item5_position_y;
-        item5.position.z = item5_position_z;
-        scene.add( item5 );
-        {% endif %}
 
 
 
