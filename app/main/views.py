@@ -386,6 +386,16 @@ def show_route(id):
     danger_list = '!'.join(all_dangers)
     item1_dimension = None
     item1_position = None
+    item_dimension = []
+    item_position = []
+    iterator = 0
+    for item in items:
+        item_dimension.append([items[iterator].width, items[iterator].height, items[iterator].length])
+        item_position.append([items[iterator].position_x, items[iterator].position_y, items[iterator].position_z])
+        iterator += 1
+        print(item)
+    print(item_dimension)
+    print(item_position)
     if items_number >= 1:
         item1_dimension = [items[0].width, items[0].height, items[0].length]
         item1_position = [items[0].position_x, items[0].position_y, items[0].position_z]
@@ -421,7 +431,8 @@ def show_route(id):
                            item2_position=item2_position, item2_dimension=item2_dimension,
                            item3_position=item3_position, item3_dimension=item3_dimension,
                            item4_position=item4_position, item4_dimension=item4_dimension,
-                           item5_position=item5_position, item5_dimension=item5_dimension)
+                           item5_position=item5_position, item5_dimension=item5_dimension,
+                           item_dimension=item_dimension, item_position=item_position)
 
 
 @main.route('/map', methods=['GET', 'POST'])

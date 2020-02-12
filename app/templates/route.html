@@ -93,7 +93,13 @@
             new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide }), // BACK SIDE
         ];
 
-        {% if items_number >= 1 %}
+        {% for width, height, length in item_dimension %}
+            var iteration = {{ loop.index }} - 1;
+            scene.add( new THREE.Mesh(new THREE.BoxGeometry( parseFloat({{ width }}), parseFloat({{ height }}), parseFloat({{ length }}) ),
+                new THREE.MeshBasicMaterial({color: 0x4FDCCC, wireframe: true})) );
+        {% endfor %}
+
+{#        {% if items_number >= 1 %}
         var item1_dimension_x = parseFloat({{ item1_dimension[0] }});
         var item1_dimension_y = parseFloat({{ item1_dimension[1] }});
         var item1_dimension_z = parseFloat({{ item1_dimension[2] }});
@@ -109,7 +115,7 @@
         item1.position.y = item1_position_y;
         item1.position.z = item1_position_z;
         scene.add( item1 );
-        {% endif %}
+        {% endif %}#}
 
         {% if items_number >= 2 %}
         var item2_dimension_x = parseFloat({{ item2_dimension[0] }});
