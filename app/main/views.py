@@ -387,63 +387,33 @@ def show_route(id):
     item1_dimension = None
     item1_position = None
     if items_number >= 1:
-        item1_dimension_x = items[0].width
-        item1_dimension_y = items[0].height
-        item1_dimension_z = items[0].length
-        item1_dimension = [item1_dimension_x, item1_dimension_y, item1_dimension_z]
-        item1_position_x = items[0].position_x
-        item1_position_y = items[0].position_y
-        item1_position_z = items[0].position_z
-        item1_position = [item1_position_x, item1_position_y, item1_position_z, items[0].weight]
+        item1_dimension = [items[0].width, items[0].height, items[0].length]
+        item1_position = [items[0].position_x, items[0].position_y, items[0].position_z]
 
     item2_dimension = None
     item2_position = None
     if items_number >= 2:
-        item2_dimension_x = items[1].width
-        item2_dimension_y = items[1].height
-        item2_dimension_z = items[1].length
-        item2_dimension = [item2_dimension_x, item2_dimension_y, item2_dimension_z]
-        item2_position_x = items[1].position_x
-        item2_position_y = items[1].position_y
-        item2_position_z = items[1].position_z
-        item2_position = [item2_position_x, item2_position_y, item2_position_z, items[1].weight]
+        item2_dimension = [items[1].width, items[1].height, items[1].length]
+        item2_position = [items[1].position_x, items[1].position_y, items[1].position_z]
 
 
     item3_dimension = None
     item3_position = None
     if items_number >= 3:
-        item3_dimension_x = items[2].width
-        item3_dimension_y = items[2].height
-        item3_dimension_z = items[2].length
-        item3_dimension = [item3_dimension_x, item3_dimension_y, item3_dimension_z]
-        item3_position_x = items[2].position_x
-        item3_position_y = items[2].position_y
-        item3_position_z = items[2].position_z
-        item3_position = [item3_position_x, item3_position_y, item3_position_z, items[3].weight]
+        item3_dimension = [items[2].width, items[2].height, items[2].length]
+        item3_position = [items[2].position_x, items[2].position_y, items[2].position_z]
 
     item4_dimension = None
     item4_position = None
     if items_number >= 4:
-        item4_dimension_x = items[3].width
-        item4_dimension_y = items[3].height
-        item4_dimension_z = items[3].length
-        item4_dimension = [item4_dimension_x, item4_dimension_y, item4_dimension_z]
-        item4_position_x = items[3].position_x
-        item4_position_y = items[3].position_y
-        item4_position_z = items[3].position_z
-        item4_position = [item4_position_x, item4_position_y, item4_position_z, items[4].weight]
+        item4_dimension = [items[3].width, items[3].height, items[3].length]
+        item4_position = [items[3].position_x, items[3].position_y, items[3].position_z]
 
     item5_dimension = None
     item5_position = None
     if items_number >= 5:
-        item5_dimension_x = items[4].width
-        item5_dimension_y = items[4].height
-        item5_dimension_z = items[4].length
-        item5_dimension = [item5_dimension_x, item5_dimension_y, item5_dimension_z]
-        item5_position_x = items[4].position_x
-        item5_position_y = items[4].position_y
-        item5_position_z = items[4].position_z
-        item5_position = [item5_position_x, item5_position_y, item5_position_z, items[5].weight]
+        item5_dimension = [items[4].width, items[4].height, items[4].length]
+        item5_position = [items[4].position_x, items[4].position_y, items[4].position_z]
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list), items_number=items_number,
