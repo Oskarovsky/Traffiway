@@ -96,7 +96,7 @@
         {% for width, height, length, x, y, z in item_parameters %}
             var item = new THREE.Mesh(
                         new THREE.BoxGeometry( parseFloat({{ width }}), parseFloat({{ height }}), parseFloat({{ length }}) ),
-                        new THREE.MeshBasicMaterial({color: 0x4FDCCC, wireframe: true}));
+                        new THREE.MeshBasicMaterial({color: '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6), wireframe: true}));
                 item.position.x = parseFloat({{ x }});
                 item.position.y = parseFloat({{ y }});
                 item.position.z = parseFloat({{ z }});
