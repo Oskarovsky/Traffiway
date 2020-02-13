@@ -477,12 +477,6 @@ def map():
         flash(Markup('This route has been added to the database - <a href="/route/'
                      + str(journey.id) + '" class="alert-link">Show the route</a>'))
 
-        # point = geocoderApi.free_form(value)
-        # dict = json.loads(point.as_json_string())
-        # dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-        # point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
-        # localizations.append([value, dict_json, json.dumps(point_positions)])
-
         return render_template('map.html', form=form,
                                danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
@@ -499,9 +493,6 @@ def map():
                                next_point_positions1=localizations[2][2] or None,
                                next_point_positions2=localizations[3][2] or None,
                                localizations=localizations)
-                               # next_point_positions3=localizations[4][2] or None,
-                               # next_point_positions4=localizations[5][2] or None,
-                               # next_point_positions5=localizations[6][2] or None)
     return render_template('map.html', form=form)
 
 

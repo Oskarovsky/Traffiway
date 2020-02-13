@@ -122,7 +122,7 @@
           // The routing mode:
           'mode': 'fastest;car',
           // The start point of the route:
-          'waypoint0': 'geo!' + start_point_positions,
+          'waypoint0': 'geo!' + {{ localizations[0][2]|safe }},
           // To retrieve the shape of the route we choose the route
           // representation mode 'display'
           'representation': 'display',
