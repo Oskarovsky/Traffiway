@@ -103,14 +103,6 @@
 
       var localization_counter = {{ localization_counter|safe }};
 
-      var start_point_positions = {{ start_point_positions|safe }};
-      var end_point_positions = {{ end_point_positions|safe }};
-      var next_point_positions1 = {{ next_point_positions1|safe }};
-      var next_point_positions2 = {{ next_point_positions2|safe }};
-      {#var next_point_positions3 = {{ next_point_positions3|safe }};#}
-      {#var next_point_positions4 = {{ next_point_positions4|safe }};#}
-      {#var next_point_positions5 = {{ next_point_positions5|safe }};#}
-
       var avoid_areas = {{ danger_list|safe }};
 
       var waypoints_list = {};
@@ -135,7 +127,7 @@
       console.log(waypoints_list);
       console.log(routingParameters);
 
-
+{#
       if (localization_counter === 1) {
           var routingParameters = {
               // The routing mode:
@@ -165,7 +157,7 @@
               // areas which transport should avoid
               'avoidareas': avoid_areas
               };
-{#      } else if (localization_counter === 3) {
+#}{#      } else if (localization_counter === 3) {
           var routingParameters = {
               // The routing mode:
               'mode': 'fastest;car',
@@ -180,7 +172,7 @@
               'representation': 'display',
               // areas which transport should avoid
               'avoidareas': avoid_areas
-              };#}
+              };#}{#
       } else if (localization_counter === 4) {
           var routingParameters = {
               // The routing mode:
@@ -235,7 +227,7 @@
               // areas which transport should avoid
               'avoidareas': avoid_areas
               };
-      }
+      }#}
 
 
       // Define a callback function to process the routing response:

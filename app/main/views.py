@@ -450,20 +450,10 @@ def map():
 
         journey = Journey(start_localization=localizations[0][0],
                           end_localization=localizations[1][0],
-                          next_localization1=localizations[2][0] or None,
-                          next_localization2=localizations[3][0] or None,
-                          # next_localization3=localizations[4][0] or None,
-                          # next_localization4=localizations[5][0] or None,
-                          # next_localization5=localizations[6][0] or None,
                           author_id=current_user.id, start_time=form.start_time.data,
                           title=form.title.data + ' [' + form.start_place.data + ' - ' + form.end_place.data + ']',
                           start_point_positions=localizations[0][2],
                           end_point_positions=localizations[1][2],
-                          next_point_positions1=localizations[2][2] or None,
-                          next_point_positions2=localizations[3][2] or None,
-                          # next_point_positions3=localizations[4][2] or None,
-                          # next_point_positions4=localizations[5][2] or None,
-                          # next_point_positions5=localizations[6][2] or None,
                           used_capacity_height=0, used_capacity_length=0,
                           used_capacity_weight=0, used_capacity_width=0,
                           free_capacity_length=free_capacity_length,
@@ -490,8 +480,6 @@ def map():
                                start_point=localizations[0][1], next_point=localizations[1][1],
                                start_point_positions=localizations[0][2],
                                end_point_positions=localizations[1][2],
-                               next_point_positions1=localizations[2][2] or None,
-                               next_point_positions2=localizations[3][2] or None,
                                localizations=localizations)
     return render_template('map.html', form=form)
 
