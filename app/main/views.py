@@ -383,29 +383,34 @@ def show_route(id):
 def map():
     form = MapForm()
     temp_counter = 0
-    localization_counter = 0
-
     available_vehicles = Car.query.filter(Car.author_id == current_user.id)
     vehicles_list = [(j.id, j.name) for j in available_vehicles]
     form.car_id.choices = vehicles_list
 
     if form.validate_on_submit():
-
         localizations = []
         for field, value in form.data.items():
             if value is "" or value is None:
                 continue
             if isinstance(value, str):
-                point = geocoderApi.free_form(value)
-                dict = json.loads(point.as_json_string())
-                dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-                point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                 if field.startswith("start"):
+                    point = geocoderApi.free_form(value)
+                    dict = json.loads(point.as_json_string())
+                    dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+                    point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.insert(0, [value, dict_json, json.dumps(point_positions)])
                 elif field.startswith("end"):
+                    point = geocoderApi.free_form(value)
+                    dict = json.loads(point.as_json_string())
+                    dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+                    point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.insert(1, [value, dict_json, json.dumps(point_positions)])
                     temp_counter += 1
                 elif field.startswith("next"):
+                    point = geocoderApi.free_form(value)
+                    dict = json.loads(point.as_json_string())
+                    dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+                    point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.append([value, dict_json, json.dumps(point_positions)])
                     temp_counter += 1
         print(localizations)
@@ -492,7 +497,8 @@ def map():
                                start_point_positions=localizations[0][2],
                                end_point_positions=localizations[1][2],
                                next_point_positions1=localizations[2][2] or None,
-                               next_point_positions2=localizations[3][2] or None)
+                               next_point_positions2=localizations[3][2] or None,
+                               localizations=localizations)
                                # next_point_positions3=localizations[4][2] or None,
                                # next_point_positions4=localizations[5][2] or None,
                                # next_point_positions5=localizations[6][2] or None)

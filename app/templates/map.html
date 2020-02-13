@@ -113,6 +113,29 @@
 
       var avoid_areas = {{ danger_list|safe }};
 
+      var waypoints_list = {};
+      {% for waypoint in localizations[1:] %}
+          waypoints_list["waypoint"+{{ loop.index }}] = {{ waypoint[2]|safe }};
+      {% endfor %}
+
+      var routingParameters = {
+          // The routing mode:
+          'mode': 'fastest;car',
+          // The start point of the route:
+          'waypoint0': 'geo!' + start_point_positions,
+          // To retrieve the shape of the route we choose the route
+          // representation mode 'display'
+          'representation': 'display',
+          // areas which transport should avoid
+          'avoidareas': avoid_areas
+      };
+      {% for waypoint in localizations[1:] %}
+          routingParameters["waypoint"+{{ loop.index }}] = "geo!" + {{ waypoint[2]|safe }};
+      {% endfor %}
+      console.log(waypoints_list);
+      console.log(routingParameters);
+
+
       if (localization_counter === 1) {
           var routingParameters = {
               // The routing mode:
@@ -142,7 +165,7 @@
               // areas which transport should avoid
               'avoidareas': avoid_areas
               };
-      } else if (localization_counter === 3) {
+{#      } else if (localization_counter === 3) {
           var routingParameters = {
               // The routing mode:
               'mode': 'fastest;car',
@@ -157,7 +180,7 @@
               'representation': 'display',
               // areas which transport should avoid
               'avoidareas': avoid_areas
-              };
+              };#}
       } else if (localization_counter === 4) {
           var routingParameters = {
               // The routing mode:
