@@ -396,25 +396,16 @@ def map():
             if value is "" or value is None:
                 continue
             if isinstance(value, str):
+                point = geocoderApi.free_form(value)
+                dict = json.loads(point.as_json_string())
+                dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
+                point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                 if field.startswith("start"):
-                    point = geocoderApi.free_form(value)
-                    dict = json.loads(point.as_json_string())
-                    dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-                    point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.insert(0, [value, dict_json, json.dumps(point_positions)])
-                    #print(json.dumps(point_positions), value)
                 elif field.startswith("end"):
-                    point = geocoderApi.free_form(value)
-                    dict = json.loads(point.as_json_string())
-                    dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-                    point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.insert(1, [value, dict_json, json.dumps(point_positions)])
                     temp_counter += 1
                 elif field.startswith("next"):
-                    point = geocoderApi.free_form(value)
-                    dict = json.loads(point.as_json_string())
-                    dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
-                    point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.append([value, dict_json, json.dumps(point_positions)])
                     temp_counter += 1
         print(localizations)
