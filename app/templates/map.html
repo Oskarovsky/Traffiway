@@ -106,26 +106,33 @@
       var avoid_areas = {{ danger_list|safe }};
 
       var waypoints_list = {};
-      {% for waypoint in localizations[1:] %}
-          waypoints_list["waypoint"+{{ loop.index }}] = {{ waypoint[2]|safe }};
-      {% endfor %}
 
-      var routingParameters = {
-          // The routing mode:
-          'mode': 'fastest;car',
-          // The start point of the route:
-          'waypoint0': 'geo!' + {{ localizations[0][2]|safe }},
-          // To retrieve the shape of the route we choose the route
-          // representation mode 'display'
-          'representation': 'display',
-          // areas which transport should avoid
-          'avoidareas': avoid_areas
-      };
-      {% for waypoint in localizations[1:] %}
-          routingParameters["waypoint"+{{ loop.index }}] = "geo!" + {{ waypoint[2]|safe }};
-      {% endfor %}
-      console.log(waypoints_list);
-      console.log(routingParameters);
+      var tempArray = {{ localizations|safe }};
+
+      if (Array.isArray(tempArray) && tempArray.length) {
+          {% for waypoint in localizations[1:] %}
+              waypoints_list["waypoint"+{{ loop.index }}] = {{ waypoint[2]|safe }};
+          {% endfor %}
+
+          var routingParameters = {
+              // The routing mode:
+              'mode': 'fastest;car',
+              // The start point of the route:
+              'waypoint0': 'geo!' + {{ localizations[0][2]|safe }},
+              // To retrieve the shape of the route we choose the route
+              // representation mode 'display'
+              'representation': 'display',
+              // areas which transport should avoid
+              'avoidareas': avoid_areas
+          };
+          {% for waypoint in localizations[1:] %}
+              routingParameters["waypoint" + {{ loop.index }}] = "geo!" + {{ waypoint[2]|safe }};
+          {% endfor %}
+          console.log(waypoints_list);
+          console.log(routingParameters);
+      }
+
+
 
 
       // Define a callback function to process the routing response:

@@ -386,9 +386,9 @@ def map():
     available_vehicles = Car.query.filter(Car.author_id == current_user.id)
     vehicles_list = [(j.id, j.name) for j in available_vehicles]
     form.car_id.choices = vehicles_list
+    localizations = []
 
     if form.validate_on_submit():
-        localizations = []
         for field, value in form.data.items():
             if value is "" or value is None:
                 continue
@@ -466,7 +466,7 @@ def map():
         db.session.commit()
         flash(Markup('This route has been added to the database - <a href="/route/'
                      + str(journey.id) + '" class="alert-link">Show the route</a>'))
-
+        print(localizations)
         return render_template('map.html', form=form,
                                danger_list=json.dumps(danger_list),
                                all_dangers=all_dangers, localization_counter=temp_counter,
@@ -481,7 +481,8 @@ def map():
                                start_point_positions=localizations[0][2],
                                end_point_positions=localizations[1][2],
                                localizations=localizations)
-    return render_template('map.html', form=form)
+    return render_template('map.html', form=form, localizations=json.dumps(localizations),
+                           localization_counter=temp_counter)
 
 
 @main.route('/geocode', methods=['GET'])
