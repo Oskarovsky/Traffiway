@@ -190,116 +190,26 @@
 
       var localization_counter = {{ journey.localization_counter|safe }};
 
-      var start_point_positions = {{ journey.start_point_positions|safe }};
-      var end_point_positions = {{ journey.end_point_positions|safe }};
-      var next_point_positions1 = {{ journey.next_point_positions1|safe }};
-      var next_point_positions2 = {{ journey.next_point_positions2|safe }};
-      var next_point_positions3 = {{ journey.next_point_positions3|safe }};
-      var next_point_positions4 = {{ journey.next_point_positions4|safe }};
-      var next_point_positions5 = {{ journey.next_point_positions5|safe }};
-
       var avoid_areas = {{ danger_list|safe }};
 
+      var tempArray = {{ localizations|safe }};
 
-      if (localization_counter === 1) {
+      if (Array.isArray(tempArray) && tempArray.length) {
           var routingParameters = {
               // The routing mode:
               'mode': 'fastest;car',
               // The start point of the route:
-              'waypoint0': 'geo!' + start_point_positions,
-              // The end point of the route:
-              'waypoint1': 'geo!' + end_point_positions,
+              'waypoint0': 'geo!' + {{ localizations[0][0]|safe }},
               // To retrieve the shape of the route we choose the route
               // representation mode 'display'
               'representation': 'display',
               // areas which transport should avoid
               'avoidareas': avoid_areas
-              };
-      } else if (localization_counter === 2) {
-          var routingParameters = {
-              // The routing mode:
-              'mode': 'fastest;car',
-              // The start point of the route:
-              'waypoint0': 'geo!' + start_point_positions,
-              // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions1,
-              'waypoint2': 'geo!' + end_point_positions,
-              // To retrieve the shape of the route we choose the route
-              // representation mode 'display'
-              'representation': 'display',
-              // areas which transport should avoid
-              'avoidareas': avoid_areas
-              };
-      } else if (localization_counter === 3) {
-          var routingParameters = {
-              // The routing mode:
-              'mode': 'fastest;car',
-              // The start point of the route:
-              'waypoint0': 'geo!' + start_point_positions,
-              // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions1,
-              'waypoint2': 'geo!' + next_point_positions2,
-              'waypoint3': 'geo!' + end_point_positions,
-              // To retrieve the shape of the route we choose the route
-              // representation mode 'display'
-              'representation': 'display',
-              // areas which transport should avoid
-              'avoidareas': avoid_areas
-              };
-      } else if (localization_counter === 4) {
-          var routingParameters = {
-              // The routing mode:
-              'mode': 'fastest;car',
-              // The start point of the route:
-              'waypoint0': 'geo!' + start_point_positions,
-              // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions1,
-              'waypoint2': 'geo!' + next_point_positions2,
-              'waypoint3': 'geo!' + next_point_positions3,
-              'waypoint4': 'geo!' + end_point_positions,
-              // To retrieve the shape of the route we choose the route
-              // representation mode 'display'
-              'representation': 'display',
-              // areas which transport should avoid
-              'avoidareas': avoid_areas
-              };
-      } else if (localization_counter === 5) {
-          var routingParameters = {
-              // The routing mode:
-              'mode': 'fastest;car',
-              // The start point of the route:
-              'waypoint0': 'geo!' + start_point_positions,
-              // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions1,
-              'waypoint2': 'geo!' + next_point_positions2,
-              'waypoint3': 'geo!' + next_point_positions3,
-              'waypoint4': 'geo!' + next_point_positions4,
-              'waypoint5': 'geo!' + end_point_positions,
-              // To retrieve the shape of the route we choose the route
-              // representation mode 'display'
-              'representation': 'display',
-              // areas which transport should avoid
-              'avoidareas': avoid_areas
-              };
-      } else if (localization_counter === 6) {
-          var routingParameters = {
-              // The routing mode:
-              'mode': 'fastest;car',
-              // The start point of the route:
-              'waypoint0': 'geo!' + start_point_positions,
-              // The end point of the route:
-              'waypoint1': 'geo!' + next_point_positions1,
-              'waypoint2': 'geo!' + next_point_positions2,
-              'waypoint3': 'geo!' + next_point_positions3,
-              'waypoint4': 'geo!' + next_point_positions4,
-              'waypoint5': 'geo!' + next_point_positions5,
-              'waypoint6': 'geo!' + end_point_positions,
-              // To retrieve the shape of the route we choose the route
-              // representation mode 'display'
-              'representation': 'display',
-              // areas which transport should avoid
-              'avoidareas': avoid_areas
-              };
+          };
+          {% for waypoint in localizations[1:] %}
+              routingParameters["waypoint" + {{ loop.index }}] = "geo!" + {{ waypoint[0]|safe }};
+          {% endfor %}
+          console.log(routingParameters);
       }
 
 

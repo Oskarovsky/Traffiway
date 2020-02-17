@@ -368,6 +368,20 @@ def show_route(id):
     all_dangers = [Danger.position for Danger in Danger.query.all()]
     danger_list = '!'.join(all_dangers)
     item_parameters = []
+    localizations = []
+    localizations.insert(0, [route.start_point_positions, route.start_localization])
+    localizations.insert(1, [route.end_point_positions, route.end_localization])
+    if route.next_point_positions1 is not None:
+        localizations.append([route.next_point_positions1, route.next_localization1])
+    if route.next_point_positions2 is not None:
+        localizations.append([route.next_point_positions2, route.next_localization2])
+    if route.next_point_positions3 is not None:
+        localizations.append([route.next_point_positions3, route.next_localization3])
+    if route.next_point_positions4 is not None:
+        localizations.append([route.next_point_positions4, route.next_localization4])
+    if route.next_point_positions5 is not None:
+        localizations.append([route.next_point_positions5, route.next_localization5])
+
     iterator = 0
     for item in items:
         item_parameters.append([items[iterator].width, items[iterator].height, items[iterator].length,
@@ -376,7 +390,7 @@ def show_route(id):
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list), items_number=items_number,
-                           item_parameters=item_parameters)
+                           item_parameters=item_parameters, localizations=localizations)
 
 
 @main.route('/map', methods=['GET', 'POST'])
