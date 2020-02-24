@@ -402,6 +402,7 @@ def map():
     vehicles_list = [(j.id, j.name) for j in available_vehicles]
     form.car_id.choices = vehicles_list
     localizations = []
+    entry_localizations = []
 
     if form.validate_on_submit():
         for field, value in form.data.items():
@@ -414,12 +415,14 @@ def map():
                     dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
                     point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.insert(0, [value, dict_json, json.dumps(point_positions)])
+                    entry_localizations.insert(0, [value, dict_json, json.dumps(point_positions)])
                 elif field.startswith("end"):
                     point = geocoderApi.free_form(value)
                     dict = json.loads(point.as_json_string())
                     dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
                     point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.insert(1, [value, dict_json, json.dumps(point_positions)])
+                    entry_localizations.insert(1, [value, dict_json, json.dumps(point_positions)])
                     temp_counter += 1
                 elif field.startswith("next"):
                     point = geocoderApi.free_form(value)
@@ -427,7 +430,11 @@ def map():
                     dict_json = dict['Response']['View'][0]['Result'][0]['Location']['DisplayPosition']
                     point_positions = str(dict_json['Latitude']) + ',' + str(dict_json['Longitude'])
                     localizations.append([value, dict_json, json.dumps(point_positions)])
+                    entry_localizations.append([value, dict_json, json.dumps(point_positions)])
                     temp_counter += 1
+        for field, value in form.data.items():
+            if value is "" or value is None:
+                localizations.append([value, None, None])
         print(localizations)
 
         selected_car = Car.query.filter(Car.id == form.car_id.data).first()
@@ -477,7 +484,15 @@ def map():
                           free_capacity_height=free_capacity_height,
                           localization_counter=temp_counter, car_id=form.car_id.data,
                           next_localization1=localizations[2][0] or None,
-                          next_point_positions1=localizations[2][2] or None)
+                          next_point_positions1=localizations[2][2] or None,
+                          next_localization2=localizations[3][0] or None,
+                          next_point_positions2=localizations[3][2] or None,
+                          next_localization3=localizations[4][0] or None,
+                          next_point_positions3=localizations[4][2] or None,
+                          next_localization4=localizations[5][0] or None,
+                          next_point_positions4=localizations[5][2] or None,
+                          next_localization5=localizations[6][0] or None,
+                          next_point_positions5=localizations[6][2] or None)
 
         db.session.add(journey)
         db.session.commit()
@@ -497,9 +512,9 @@ def map():
                                start_point=localizations[0][1], next_point=localizations[1][1],
                                start_point_positions=localizations[0][2],
                                end_point_positions=localizations[1][2],
-                               localizations=localizations)
+                               localizations=localizations, entry_localizations=entry_localizations)
     return render_template('map.html', form=form, localizations=json.dumps(localizations),
-                           localization_counter=temp_counter)
+                           localization_counter=temp_counter, entry_localizations=json.dumps(entry_localizations))
 
 
 @main.route('/geocode', methods=['GET'])
