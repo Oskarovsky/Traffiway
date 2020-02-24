@@ -11,7 +11,8 @@
         Start localization: {{ journey.start_localization }} <br>
         Start time: {{ journey.start_time }} <br>
         End localization: {{ journey.end_localization }} <br>
-        Vehicle: {{ car.name }} <a href="{{ url_for('main.show_car', id=car.id) }}">(Show details)</a>
+        Number of localizations: {{ localization_amount }} <br>
+        Vehicle: {{ car.name }} <a href="{{ url_for('main.show_car', id=car.id) }}">(Show details)</a><br>
 
         <h4>All items:</h4>
         <table class="table table-striped table-bordered" style="width: 100%">
@@ -188,11 +189,12 @@
 });
 
 
-      var localization_counter = {{ journey.localization_counter|safe }};
+      var localization_counter = {{ journey.localization_counter|safe }} - 1;
 
       var avoid_areas = {{ danger_list|safe }};
 
       var tempArray = {{ localizations|safe }};
+      console.log(tempArray)
 
       if (Array.isArray(tempArray) && tempArray.length) {
           var routingParameters = {

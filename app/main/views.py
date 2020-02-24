@@ -390,7 +390,8 @@ def show_route(id):
 
     return render_template('route.html', journey=route, items=items, car=car, id=id,
                            danger_list=json.dumps(danger_list), items_number=items_number,
-                           item_parameters=item_parameters, localizations=localizations)
+                           item_parameters=item_parameters, localizations=localizations,
+                           localization_amount=len(localizations))
 
 
 @main.route('/map', methods=['GET', 'POST'])
@@ -474,7 +475,9 @@ def map():
                           free_capacity_weight=free_capacity_weight,
                           free_capacity_width=free_capacity_width,
                           free_capacity_height=free_capacity_height,
-                          localization_counter=temp_counter, car_id=form.car_id.data)
+                          localization_counter=temp_counter, car_id=form.car_id.data,
+                          next_localization1=localizations[2][0] or None,
+                          next_point_positions1=localizations[2][2] or None)
 
         db.session.add(journey)
         db.session.commit()
