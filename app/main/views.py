@@ -513,6 +513,9 @@ def map():
                                start_point_positions=localizations[0][2],
                                end_point_positions=localizations[1][2],
                                localizations=localizations, entry_localizations=entry_localizations)
+
+    # localizations zawiera wszystkie punkty zamieszczone w bazie danych (również te puste Nulle)
+    # entry_localizations zawiera jedynie punkty, które użytkownik wporwadził do paneli Form
     return render_template('map.html', form=form, localizations=json.dumps(localizations),
                            localization_counter=temp_counter, entry_localizations=json.dumps(entry_localizations))
 
