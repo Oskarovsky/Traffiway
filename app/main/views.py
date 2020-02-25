@@ -463,6 +463,10 @@ def map():
         print(time_from_start_to_end)
         print(distance_from_start_to_end)
 
+        start_localization = localizations[0][0]
+        start_point_positions = localizations[0][2]
+        end_localization = localizations[1][0]
+        end_point_positions = localizations[1][2]
         next_localization1 = localizations[2][0]
         next_point_positions1 = localizations[2][2]
         next_localization2 = localizations[3][0]
@@ -515,12 +519,12 @@ def map():
         all_dangers = [Danger.position for Danger in Danger.query.all()]
         danger_list = '!'.join(all_dangers)
 
-        journey = Journey(start_localization=localizations[0][0],
-                          end_localization=localizations[1][0],
+        journey = Journey(start_localization=start_localization,
+                          end_localization=end_localization,
                           author_id=current_user.id, start_time=form.start_time.data,
                           title=form.title.data + ' [' + form.start_place.data + ' - ' + form.end_place.data + ']',
-                          start_point_positions=localizations[0][2],
-                          end_point_positions=localizations[1][2],
+                          start_point_positions=start_point_positions,
+                          end_point_positions=end_point_positions,
                           used_capacity_height=0, used_capacity_length=0,
                           used_capacity_weight=0, used_capacity_width=0,
                           free_capacity_length=free_capacity_length,
@@ -554,9 +558,9 @@ def map():
                                time_from_point2_to_end=json.dumps(time_from_point2_to_end) or None,
                                time_from_point3_to_end=json.dumps(time_from_point3_to_end) or None,
                                time_from_point1_to_point2=json.dumps(time_from_point1_to_point2) or None,
-                               start_point=localizations[0][1], next_point=localizations[1][1],
-                               start_point_positions=localizations[0][2],
-                               end_point_positions=localizations[1][2],
+                               start_point=start_localization, next_point=end_localization,
+                               start_point_positions=start_point_positions,
+                               end_point_positions=end_point_positions,
                                localizations=localizations, entry_localizations=entry_localizations)
 
     # localizations zawiera wszystkie punkty zamieszczone w bazie danych (również te puste Nulle)

@@ -188,13 +188,11 @@
 
 });
 
-
       var localization_counter = {{ journey.localization_counter|safe }} - 1;
 
       var avoid_areas = {{ danger_list|safe }};
 
       var tempArray = {{ localizations|safe }};
-      console.log(tempArray)
 
       if (Array.isArray(tempArray) && tempArray.length) {
           var routingParameters = {
@@ -239,11 +237,12 @@
                 linestring.pushLatLngAlt(parts[0], parts[1]);
             });
 
+
             // Retrieve the mapped positions of the requested waypoints:
             if (localization_counter === 1 || localization_counter === 0) {
                 startPoint = route.waypoint[0].mappedPosition;
                 endPoint = route.waypoint[1].mappedPosition;
-                            // Create a marker for the start point:
+                // Create a marker for the start point:
                 var startMarker = new H.map.Marker({
                     lat: startPoint.latitude,
                     lng: startPoint.longitude
@@ -455,10 +454,11 @@
 
             // create a group that represents the route line and contains
             // outline and the pattern
+
             var routeLine = new H.map.Group();
             routeLine.addObjects([routeOutline, routeArrows]);
 
-            if (localization_counter === 1) {
+            if (localization_counter === 1 || localization_counter === 0) {
                // Add the route polyline and the two markers to the map:
                 map.addObjects([routeLine, startMarker, endMarker]);
             } else if (localization_counter === 2) {

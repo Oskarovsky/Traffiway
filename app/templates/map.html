@@ -105,14 +105,9 @@
 
       var avoid_areas = {{ danger_list|safe }};
 
-      var waypoints_list = {};
-
       var tempArray = {{ entry_localizations|safe }};
 
       if (Array.isArray(tempArray) && tempArray.length) {
-          {% for waypoint in entry_localizations[1:] %}
-              waypoints_list["waypoint"+{{ loop.index }}] = {{ waypoint[2]|safe }};
-          {% endfor %}
 
           var routingParameters = {
               // The routing mode:
@@ -129,7 +124,6 @@
               routingParameters["waypoint" + {{ loop.index }}] = "geo!" + {{ waypoint[2]|safe }};
           {% endfor %}
           routingParameters["waypoint" + (tempArray.length-1)] = "geo!" + {{ entry_localizations[1][2]|safe }}
-          console.log(waypoints_list);
           console.log(routingParameters);
       }
 
