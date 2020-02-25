@@ -456,15 +456,60 @@ def map():
         time_from_point3_to_end = None
 
 
-        # route_between_start_and_point1 = calculate_route(start_dict_json['Latitude'], start_dict_json['Longitude'],
-        #                                                  next_dict1_json['Latitude'], next_dict1_json['Longitude'])
-        # time_from_start_to_point1 = route_between_start_and_point1[0]
-        # distance_from_start_to_point1 = route_between_start_and_point1[1]
-        #
-        # route_between_point1_and_end = calculate_route(next_dict1_json['Latitude'], next_dict1_json['Longitude'],
-        #                                                end_dict_json['Latitude'], end_dict_json['Longitude'])
-        # time_from_point1_to_end = route_between_point1_and_end[0]
-        # distance_from_point1_to_end = route_between_point1_and_end[1]
+        route_between_start_and_end = calculate_route(localizations[0][1]['Latitude'], localizations[0][1]['Longitude'],
+                                                         localizations[1][1]['Latitude'], localizations[1][1]['Longitude'])
+        time_from_start_to_end = route_between_start_and_end[0]
+        distance_from_start_to_end = route_between_start_and_end[1]
+        print(time_from_start_to_end)
+        print(distance_from_start_to_end)
+
+        next_localization1 = localizations[2][0]
+        next_point_positions1 = localizations[2][2]
+        next_localization2 = localizations[3][0]
+        next_point_positions2 = localizations[3][2]
+
+        if localizations[2][1] is not None:
+            route_between_point1_and_start = calculate_route(localizations[0][1]['Latitude'],
+                                                          localizations[0][1]['Longitude'],
+                                                          localizations[2][1]['Latitude'],
+                                                          localizations[2][1]['Longitude'])
+            route_between_point1_and_end = calculate_route(localizations[1][1]['Latitude'],
+                                                          localizations[1][1]['Longitude'],
+                                                          localizations[2][1]['Latitude'],
+                                                          localizations[2][1]['Longitude'])
+            print('TIME', route_between_point1_and_start[0])
+            print('DISTANCE', route_between_point1_and_start[1])
+            print('TIME', route_between_point1_and_end[0])
+            print('DISTANCE', route_between_point1_and_end[1])
+        if localizations[3][1] is not None:
+            route_between_point2_and_start = calculate_route(localizations[0][1]['Latitude'],
+                                                          localizations[0][1]['Longitude'],
+                                                          localizations[3][1]['Latitude'],
+                                                          localizations[3][1]['Longitude'])
+            route_between_point2_and_end = calculate_route(localizations[0][1]['Latitude'],
+                                                          localizations[0][1]['Longitude'],
+                                                          localizations[3][1]['Latitude'],
+                                                          localizations[3][1]['Longitude'])
+            route_between_point2_and_point1 = calculate_route(localizations[2][1]['Latitude'],
+                                                             localizations[2][1]['Longitude'],
+                                                             localizations[3][1]['Latitude'],
+                                                             localizations[3][1]['Longitude'])
+            print('TIME', route_between_point2_and_start[0])
+            print('DISTANCE', route_between_point2_and_start[1])
+            print('TIME', route_between_point2_and_point1[0])
+            print('DISTANCE', route_between_point2_and_point1[1])
+            print('TIME', route_between_point2_and_end[0])
+            print('DISTANCE', route_between_point2_and_end[1])
+            if route_between_point2_and_start[1] < route_between_point1_and_start[1]:
+                next_localization1 = localizations[3][0]
+                next_point_positions1 = localizations[3][2]
+                next_localization2 = localizations[2][0]
+                next_point_positions2 = localizations[2][2]
+            else:
+                next_localization1 = localizations[2][0]
+                next_point_positions1 = localizations[2][2]
+                next_localization2 = localizations[3][0]
+                next_point_positions2 = localizations[3][2]
 
 
         all_dangers = [Danger.position for Danger in Danger.query.all()]
@@ -483,10 +528,10 @@ def map():
                           free_capacity_width=free_capacity_width,
                           free_capacity_height=free_capacity_height,
                           localization_counter=temp_counter, car_id=form.car_id.data,
-                          next_localization1=localizations[2][0] or None,
-                          next_point_positions1=localizations[2][2] or None,
-                          next_localization2=localizations[3][0] or None,
-                          next_point_positions2=localizations[3][2] or None,
+                          next_localization1=next_localization1 or None,
+                          next_point_positions1=next_point_positions1 or None,
+                          next_localization2=next_localization2 or None,
+                          next_point_positions2=next_point_positions2 or None,
                           next_localization3=localizations[4][0] or None,
                           next_point_positions3=localizations[4][2] or None,
                           next_localization4=localizations[5][0] or None,

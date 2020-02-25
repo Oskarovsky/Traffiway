@@ -208,9 +208,10 @@
               // areas which transport should avoid
               'avoidareas': avoid_areas
           };
-          {% for waypoint in localizations[1:] %}
+          {% for waypoint in localizations[2:] %}
               routingParameters["waypoint" + {{ loop.index }}] = "geo!" + {{ waypoint[0]|safe }};
           {% endfor %}
+          routingParameters["waypoint" + (tempArray.length-1)] = "geo!" + {{ localizations[1][0]|safe }}
           console.log(routingParameters);
       }
 
@@ -239,7 +240,7 @@
             });
 
             // Retrieve the mapped positions of the requested waypoints:
-            if (localization_counter === 1) {
+            if (localization_counter === 1 || localization_counter === 0) {
                 startPoint = route.waypoint[0].mappedPosition;
                 endPoint = route.waypoint[1].mappedPosition;
                             // Create a marker for the start point:

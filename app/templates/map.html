@@ -125,9 +125,10 @@
               // areas which transport should avoid
               'avoidareas': avoid_areas
           };
-          {% for waypoint in entry_localizations[1:] %}
+          {% for waypoint in entry_localizations[2:] %}
               routingParameters["waypoint" + {{ loop.index }}] = "geo!" + {{ waypoint[2]|safe }};
           {% endfor %}
+          routingParameters["waypoint" + (tempArray.length-1)] = "geo!" + {{ entry_localizations[1][2]|safe }}
           console.log(waypoints_list);
           console.log(routingParameters);
       }
